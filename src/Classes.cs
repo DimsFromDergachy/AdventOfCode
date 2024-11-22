@@ -1,5 +1,6 @@
-struct Y2015 {}
+public struct Y2015 {}
 
-struct D01 {}
+public struct D01 {}
 
-struct PartA {}
+public struct PartA {}
+public struct PartB {}
