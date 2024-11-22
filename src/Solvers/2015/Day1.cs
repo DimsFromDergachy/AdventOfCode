@@ -1,10 +1,8 @@
 #pragma warning disable CS8509
 
-namespace Solver;
-
-public class Solver<Y2015, D01, PartA> : SolverBase<Y2015, D01, PartA>
+class Solver2015_Day01_PartA : Solver
 {
-    public override object Solve(string input) =>
+    internal override object Solve(string input) =>
         input.Aggregate(0, (res, ch) => ch switch
         {
             '(' => res + 1,
@@ -12,9 +10,9 @@ public class Solver<Y2015, D01, PartA> : SolverBase<Y2015, D01, PartA>
         });
 }
 
-public class Solver<Y2015, D01, PartB> : SolverBase<Y2015, D01, PartB>
+class Solver2015_Day01_PartB : Solver
 {
-    public override object Solve(string input)
+    internal override object Solve(string input)
     {
         throw new NotImplementedException();
     }

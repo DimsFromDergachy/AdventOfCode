@@ -1,4 +1,4 @@
-public enum Part
+enum Part
 {
     A,
     B,

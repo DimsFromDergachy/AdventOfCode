@@ -1,6 +1,4 @@
-namespace Solver;
-
-public abstract class SolverBase<T1, T2, T3>
+abstract class Solver
 {
-    public abstract object Solve(string input);
+    internal abstract object Solve(string input);
 }
