@@ -1,3 +1,3 @@
 # AdventOfCode
 
-> dotnet run 2015 01 A
+> dotnet run --project src/src.csproj 2015 03 A

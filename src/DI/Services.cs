@@ -20,7 +20,9 @@ static class Services
                     &&
                     part == Enum.Parse<Part>(args[2].Value!.ToString()!))
                 {
-                    return (Solver) Activator.CreateInstance(type, part)!;
+                    var solver = (Solver) Activator.CreateInstance(type)!;
+                    solver.Part = part;
+                    return solver;
                 }
             }
         }

@@ -8,7 +8,7 @@ namespace Year2015.Day04;
 class Miner : Solver
 {
     #pragma warning disable CS8524
-    private string HashPrefix => _part switch
+    private string HashPrefix => Part switch
     {
         Part.A => "00000",
         Part.B => "000000",
