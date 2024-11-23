@@ -1,3 +1,3 @@
 # AdventOfCode
 
-> dotnet run 2024 1
+> dotnet run 2015 01 A

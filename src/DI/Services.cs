@@ -8,13 +8,13 @@ static class Services
                 continue;
 
             var partAttribute = type.CustomAttributes.Where(a => a.AttributeType == typeof(SolverAttribute)).Single();
-            var args2 = partAttribute.ConstructorArguments;
+            var args = partAttribute.ConstructorArguments;
 
-            if (year == int.Parse(args2[0].Value!.ToString()!)
+            if (year == int.Parse(args[0].Value!.ToString()!)
                 &&
-                day  == int.Parse(args2[1].Value!.ToString()!)
+                day  == int.Parse(args[1].Value!.ToString()!)
                 &&
-                part == Enum.Parse<Part>(args2[2].Value!.ToString()!))
+                part == Enum.Parse<Part>(args[2].Value!.ToString()!))
             {
                 return (Solver) Activator.CreateInstance(type)!;
             }
