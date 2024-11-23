@@ -7,16 +7,21 @@ static class Services
             if (type.BaseType != typeof(Solver))
                 continue;
 
-            var partAttribute = type.CustomAttributes.Where(a => a.AttributeType == typeof(SolverAttribute)).Single();
-            var args = partAttribute.ConstructorArguments;
+            var attributes = type.CustomAttributes
+                .Where(a => a.AttributeType == typeof(SolverAttribute));
 
-            if (year == int.Parse(args[0].Value!.ToString()!)
-                &&
-                day  == int.Parse(args[1].Value!.ToString()!)
-                &&
-                part == Enum.Parse<Part>(args[2].Value!.ToString()!))
+            foreach (var attribute in attributes)
             {
-                return (Solver) Activator.CreateInstance(type)!;
+                var args = attribute.ConstructorArguments;
+
+                if (year == int.Parse(args[0].Value!.ToString()!)
+                    &&
+                    day  == int.Parse(args[1].Value!.ToString()!)
+                    &&
+                    part == Enum.Parse<Part>(args[2].Value!.ToString()!))
+                {
+                    return (Solver) Activator.CreateInstance(type, part)!;
+                }
             }
         }
 

@@ -3,15 +3,21 @@ using System.Text;
 
 namespace Year2015.Day04;
 
-//[Solver(2015, 04, Part.A)]
+[Solver(2015, 04, Part.A)]
 [Solver(2015, 04, Part.B)]
 class Miner : Solver
 {
+    #pragma warning disable CS8524
+    private string HashPrefix => _part switch
+    {
+        Part.A => "00000",
+        Part.B => "000000",
+    };
+
     internal override object Solve(string input) =>
         Enumerable.Range(0, int.MaxValue)
                   .Select(nonce => (nonce, Hash(input, nonce)))
-                  //.First(pair => pair.Item2.StartsWith("00000")); // Part A
-                  .First(pair => pair.Item2.StartsWith("000000"));  // Part B
+                  .First(pair => pair.Item2.StartsWith(HashPrefix));
 
     string Hash(string input, int nonce)
     {

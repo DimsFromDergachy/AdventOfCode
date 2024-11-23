@@ -1,5 +1,3 @@
-#pragma warning disable CS8509
-
 namespace Year2015.Day01;
 
 [Solver(2015, 01, Part.A)]
@@ -8,6 +6,7 @@ class SolverA : Solver
     internal override object Solve(string input) =>
         input.Aggregate(0, Move);
 
+    #pragma warning disable CS8509
     int Move(int res, char ch) => ch switch
     {
         '(' => res + 1,
@@ -23,6 +22,7 @@ class SolverB : Solver
             .TakeWhile(x => x != -1)
             .Count();
 
+    #pragma warning disable CS8509
     int Move(int res, char ch) => ch switch
     {
         '(' => res + 1,
