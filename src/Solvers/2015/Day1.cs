@@ -1,7 +1,9 @@
 #pragma warning disable CS8509
 
+namespace Year2015.Day01;
+
 [Solver(2015, 01, Part.A)]
-class Solver2015_Day01_PartA : Solver
+class SolverA : Solver
 {
     internal override object Solve(string input) =>
         input.Aggregate(0, (res, ch) => ch switch
@@ -12,7 +14,7 @@ class Solver2015_Day01_PartA : Solver
 }
 
 [Solver(2015, 01, Part.B)]
-class Solver2015_Day01_PartB : Solver
+class SolverB : Solver
 {
     internal override object Solve(string input)
     {
