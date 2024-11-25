@@ -44,16 +44,17 @@ struct Instruction
 
 static class InstructionExtensions
 {
-    #pragma warning disable CS8603
     internal static Expression ToExpression(this Instruction instruction)
     {
         switch (instruction.op)
         {
             case "":
             {
-                
-                return null;
+                // TODO: There is no signal!
+                return Expression.Parameter(typeof(ushort), instruction.wire);
             }
         };
+
+        throw new NotImplementedException($"op: {instruction.op}");
     }
 }
