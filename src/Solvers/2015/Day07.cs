@@ -44,17 +44,32 @@ struct Instruction
 
 static class InstructionExtensions
 {
-    internal static Expression ToExpression(this Instruction instruction)
+    internal static (string, Expression) ToExpression(this Instruction instruction)
     {
-        switch (instruction.op)
+        #pragma warning disable CS8509
+        return (instruction.wire, instruction.op switch
         {
-            case "":
-            {
-                // TODO: There is no signal!
-                return Expression.Parameter(typeof(ushort), instruction.wire);
-            }
-        };
-
-        throw new NotImplementedException($"op: {instruction.op}");
+            ""       => Expression.Constant(instruction.signal),
+            "NOT"    => Expression.MakeUnary(
+                            ExpressionType.Not,
+                            null, // TODO: left wire as an expression
+                            typeof(ushort)),
+            "AND"    => Expression.MakeBinary(
+                            ExpressionType.And,
+                            left:  null, // TODO: left wire as an expression
+                            right: null), // TODO: right wire as an expression
+            "OR"    => Expression.MakeBinary(
+                            ExpressionType.Or,
+                            left:  null, // TODO: left wire as an expression
+                            right: null), // TODO: right wire as an expression
+            "LSHIFT" => Expression.MakeBinary(
+                            ExpressionType.LeftShift,
+                            null, // TODO: left wire as an expression
+                            Expression.Constant(ushort.Parse(instruction.right))),
+            "RSHIFT" => Expression.MakeBinary(
+                            ExpressionType.RightShift,
+                            null, // TODO: left wire as an expression
+                            Expression.Constant(ushort.Parse(instruction.right))),
+        });
     }
 }
