@@ -1,5 +1,3 @@
-using Xunit;
-
 static class ArrayExtensions
 {
     internal static IEnumerable<T> ToEnumerable<T>(this T[,] array)

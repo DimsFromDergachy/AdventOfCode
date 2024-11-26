@@ -13,3 +13,13 @@ static class EnumerableExtensions
             }
         }
 }
+
+public class EnumerableExtensionsTest
+{
+    [Fact]
+    public void ScanTest()
+    {
+        var array = new int[] { 1, 2, 3, 4, 5 };
+        Assert.Equal([0, 1, 3, 6, 10, 15], array.Scan(0, (x, y) => x + y));
+    }
+}
