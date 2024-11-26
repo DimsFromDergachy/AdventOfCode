@@ -24,7 +24,7 @@ jobs:
       run: dotnet restore src/test.csproj
 
     - name: Build
-      run: dotnet build --no-restore src.csproj
+      run: dotnet build --no-restore src/src.csproj
 
     - name: Test
-      run: dotnet test --no-restore test.csproj
+      run: dotnet test --no-restore src/test.csproj
