@@ -18,10 +18,9 @@ jobs:
         dotnet-version: '8.0.x'
 
     - name: Restore
-      run: dotnet restore src/src.csproj
-
-    - name: Restore
-      run: dotnet restore src/test.csproj
+      run: |
+        dotnet restore src/src.csproj
+        dotnet restore src/test.csproj
 
     - name: Build
       run: dotnet build --no-restore src/src.csproj
