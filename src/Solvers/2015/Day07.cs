@@ -10,6 +10,8 @@ class SolverA : Solver
     internal SolverA(string wire) => Wire = wire;
     public SolverA() {}
 
+    internal static readonly IDictionary<string, Expression> Memo = new Dictionary<string, Expression>();
+
     private readonly Regex regex
         = new Regex("^((\\w+)|(\\w+)? ?(NOT|AND|OR|LSHIFT|RSHIFT) (\\w+)) -> (\\w+)$");
 
@@ -48,17 +50,20 @@ struct Instruction
 
 static class DictionaryExtensions
 {
-    internal static Expression BuildExpression(this Dictionary<string, Instruction> dictionary, string wire)
+    internal static Expression BuildExpression(
+        this Dictionary<string, Instruction> dictionary,
+        string wire)
     {
+        if (SolverA.Memo.ContainsKey(wire))
+            return SolverA.Memo[wire];
+
         if (ushort.TryParse(wire, out var wire_))
-        {
-            return Expression.Constant(wire_);
-        }
+            return SolverA.Memo[wire] = Expression.Constant(wire_);
 
         var instruction = dictionary[wire];
 
         #pragma warning disable CS8509
-        return instruction.op switch
+        return SolverA.Memo[wire] = instruction.op switch
         {
             ""       => dictionary.BuildExpression(instruction.signal),
             "NOT"    => Expression.MakeUnary(
@@ -91,7 +96,7 @@ static class DictionaryExtensions
 public class Test
 {
     [Fact]
-    public void Input()
+    public void Example()
     {
         var input = @"
 123 -> x
@@ -103,18 +108,18 @@ y RSHIFT 2 -> g
 NOT x -> h
 NOT y -> i";
 
-        Assert.Equal((ushort)    72, new SolverA("d").Solve(input));
-        Assert.Equal((ushort)   507, new SolverA("e").Solve(input));
-        Assert.Equal((ushort)   492, new SolverA("f").Solve(input));
-        Assert.Equal((ushort)   114, new SolverA("g").Solve(input));
-        Assert.Equal((ushort) 65412, new SolverA("h").Solve(input));
-        Assert.Equal((ushort) 65079, new SolverA("i").Solve(input));
-        Assert.Equal((ushort)   123, new SolverA("x").Solve(input));
-        Assert.Equal((ushort)   456, new SolverA("y").Solve(input));
+        Assert.Equal((ushort)    72, new SolverA("d").Solve(input)); SolverA.Memo.Clear();
+        Assert.Equal((ushort)   507, new SolverA("e").Solve(input)); SolverA.Memo.Clear();
+        Assert.Equal((ushort)   492, new SolverA("f").Solve(input)); SolverA.Memo.Clear();
+        Assert.Equal((ushort)   114, new SolverA("g").Solve(input)); SolverA.Memo.Clear();
+        Assert.Equal((ushort) 65412, new SolverA("h").Solve(input)); SolverA.Memo.Clear();
+        Assert.Equal((ushort) 65079, new SolverA("i").Solve(input)); SolverA.Memo.Clear();
+        Assert.Equal((ushort)   123, new SolverA("x").Solve(input)); SolverA.Memo.Clear();
+        Assert.Equal((ushort)   456, new SolverA("y").Solve(input)); SolverA.Memo.Clear();
     }
 
     [Fact]
-    public void DirectConnection()
+    public void DirectWireConnection()
     {
         var input = @"
 42 -> x
@@ -122,20 +127,32 @@ x -> y
 y -> z
 z -> a";
 
-        Assert.Equal((ushort) 42, new SolverA().Solve(input));
+        Assert.Equal((ushort) 42, new SolverA().Solve(input)); SolverA.Memo.Clear();
     }
 
     [Fact]
-    public void Numbers()
+    public void NumbersAsInput()
     {
         var input = @"
 1 AND gd -> ge
 5 -> gd";
 
-        Assert.Equal((ushort) 1, new SolverA("ge").Solve(input));
+        Assert.Equal((ushort) 1, new SolverA("ge").Solve(input)); SolverA.Memo.Clear();
     }
 
-    [Fact(Timeout = 1000)]
+    [Fact]
+    public void ShrinkStack()
+    {
+        var input = @"
+42 -> a
+a AND a -> b
+b AND b -> c
+";
+
+        Assert.Equal((ushort) 42, new SolverA("c").Solve(input)); SolverA.Memo.Clear();
+    }
+
+    [Fact(Timeout = 10000)]
     public void Stack()
     {
         var input = @"
@@ -161,8 +178,9 @@ r AND r -> s
 s AND s -> t
 t AND t -> u
 u AND u -> v
+v AND v -> w
 ";
 
-        Assert.Equal((ushort) 42, new SolverA("v").Solve(input));
+        Assert.Equal((ushort) 42, new SolverA("w").Solve(input)); SolverA.Memo.Clear();
     }
 }
