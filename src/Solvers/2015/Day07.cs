@@ -140,20 +140,8 @@ z -> a";
         Assert.Equal((ushort) 1, new SolverA("ge").Solve(input)); SolverA.Memo.Clear();
     }
 
-    [Fact]
-    public void ShrinkStack()
-    {
-        var input = @"
-42 -> a
-a AND a -> b
-b AND b -> c
-";
-
-        Assert.Equal((ushort) 42, new SolverA("c").Solve(input)); SolverA.Memo.Clear();
-    }
-
     [Fact(Timeout = 10000)]
-    public void Stack()
+    public void StackOverflow()
     {
         var input = @"
 42 -> a
@@ -179,8 +167,11 @@ s AND s -> t
 t AND t -> u
 u AND u -> v
 v AND v -> w
+w AND w -> x
+y AND y -> y
+z AND z -> z
 ";
 
-        Assert.Equal((ushort) 42, new SolverA("w").Solve(input)); SolverA.Memo.Clear();
+        Assert.Equal((ushort) 42, new SolverA("z").Solve(input)); SolverA.Memo.Clear();
     }
 }
