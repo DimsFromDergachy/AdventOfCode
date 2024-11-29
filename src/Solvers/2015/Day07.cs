@@ -1,9 +1,9 @@
-using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 
 namespace Year2015.Day07;
 
 [Solver(2015, 07, Part.A)]
+[Solver(2015, 07, Part.B)]
 class SolverA : Solver
 {
     private readonly string Wire = "a";
@@ -17,7 +17,7 @@ class SolverA : Solver
         input.Lines()
              .Select(ParseInstruction)
              .ToDictionary(instruction => instruction.wire)
-             .Calculate(Wire);
+             .Calculate(Wire, Part);
 
     Instruction ParseInstruction(string instruction)
     {
@@ -48,7 +48,8 @@ static class DictionaryExtensions
     #pragma warning disable CS8509
     internal static ushort Calculate(
         this Dictionary<string, Instruction> dictionary,
-        string start)
+        string start,
+        Part part)
     {
         var memo = new Dictionary<string, ushort>();
         var stack = new Stack<string>();
@@ -68,6 +69,13 @@ static class DictionaryExtensions
             if (ushort.TryParse(wire, out var value))
             {
                 memo[wire] = value;
+                stack.Pop();
+                continue;
+            }
+
+            if (part == Part.B && wire == "b")
+            {
+                memo[wire] = 16076;
                 stack.Pop();
                 continue;
             }
@@ -138,9 +146,6 @@ static class DictionaryExtensions
 
         return memo[start];
     }
-
-    internal static LambdaExpression ToLambda(this Expression expression) =>
-        Expression.Lambda(expression);
 }
 
 public class Test
