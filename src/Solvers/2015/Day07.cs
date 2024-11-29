@@ -10,8 +10,6 @@ class SolverA : Solver
     internal SolverA(string wire) => Wire = wire;
     public SolverA() {}
 
-    internal static readonly IDictionary<string, Expression> Memo = new Dictionary<string, Expression>();
-
     private readonly Regex regex
         = new Regex("^((\\w+)|(\\w+)? ?(NOT|AND|OR|LSHIFT|RSHIFT) (\\w+)) -> (\\w+)$");
 
@@ -19,10 +17,7 @@ class SolverA : Solver
         input.Lines()
              .Select(ParseInstruction)
              .ToDictionary(instruction => instruction.wire)
-             .BuildExpression(Wire)
-             .ToLambda()
-             .Compile()
-             .DynamicInvoke()!;
+             .Calculate(Wire);
 
     Instruction ParseInstruction(string instruction)
     {
@@ -50,43 +45,98 @@ struct Instruction
 
 static class DictionaryExtensions
 {
-    internal static Expression BuildExpression(
+    #pragma warning disable CS8509
+    internal static ushort Calculate(
         this Dictionary<string, Instruction> dictionary,
-        string wire)
+        string start)
     {
-        if (SolverA.Memo.ContainsKey(wire))
-            return SolverA.Memo[wire];
+        var memo = new Dictionary<string, ushort>();
+        var stack = new Stack<string>();
 
-        if (ushort.TryParse(wire, out var wire_))
-            return SolverA.Memo[wire] = Expression.Constant(wire_);
+        stack.Push(start);
 
-        var instruction = dictionary[wire];
-
-        #pragma warning disable CS8509
-        return SolverA.Memo[wire] = instruction.op switch
+        while (stack.Any())
         {
-            ""       => dictionary.BuildExpression(instruction.signal),
-            "NOT"    => Expression.MakeUnary(
-                            ExpressionType.Not,
-                            dictionary.BuildExpression(instruction.right),
-                            typeof(ushort)),
-            "AND"    => Expression.MakeBinary(
-                            ExpressionType.And,
-                            left:  dictionary.BuildExpression(instruction.left),
-                            right: dictionary.BuildExpression(instruction.right)),
-            "OR"    => Expression.MakeBinary(
-                            ExpressionType.Or,
-                            left:  dictionary.BuildExpression(instruction.left),
-                            right: dictionary.BuildExpression(instruction.right)),
-            "LSHIFT" => Expression.MakeBinary(
-                            ExpressionType.LeftShift,
-                            left:  dictionary.BuildExpression(instruction.left),
-                            Expression.Constant(int.Parse(instruction.right))),
-            "RSHIFT" => Expression.MakeBinary(
-                            ExpressionType.RightShift,
-                            left:  dictionary.BuildExpression(instruction.left),
-                            Expression.Constant(int.Parse(instruction.right))),
-        };
+            var wire = stack.Peek();
+
+            if (memo.ContainsKey(wire))
+            {
+                stack.Pop();
+                continue; // already calculated
+            }
+
+            if (ushort.TryParse(wire, out var value))
+            {
+                memo[wire] = value;
+                stack.Pop();
+                continue;
+            }
+
+            var instruction = dictionary[wire];
+
+            switch (instruction.op)
+            {
+                case "":
+                {
+                    if (memo.ContainsKey(instruction.signal))
+                    {
+                        memo[wire] = memo[instruction.signal];
+                        stack.Pop();
+                        continue;
+                    }
+                    stack.Push(instruction.signal);
+                    break;
+                }
+                case "NOT":
+                {
+                    if (memo.ContainsKey(instruction.right))
+                    {
+                        memo[wire] = (ushort) ~memo[instruction.right];
+                        stack.Pop();
+                        continue;
+                    }
+                    stack.Push(instruction.right);
+                    break;
+                }
+                case "LSHIFT":
+                case "RSHIFT":
+                {
+                    if (memo.ContainsKey(instruction.left))
+                    {
+                        memo[wire] = instruction.op switch
+                            {
+                                "LSHIFT" => (ushort) (memo[instruction.left] << int.Parse(instruction.right)),
+                                "RSHIFT" => (ushort) (memo[instruction.left] >> int.Parse(instruction.right)),
+                            };
+                        stack.Pop();
+                        continue;
+                    }
+                    stack.Push(instruction.left);
+                    break;
+                }
+                case "AND":
+                case "OR":
+                {
+                    if (memo.ContainsKey(instruction.left)
+                        &&
+                        memo.ContainsKey(instruction.right))
+                    {
+                        memo[wire] = instruction.op switch
+                            {
+                                "AND" => (ushort) (memo[instruction.left] & memo[instruction.right]),
+                                "OR"  => (ushort) (memo[instruction.left] | memo[instruction.right]),
+                            };
+                        stack.Pop();
+                        continue;
+                    }
+                    stack.Push(instruction.left);
+                    stack.Push(instruction.right);
+                    break;
+                }
+            };
+        }
+
+        return memo[start];
     }
 
     internal static LambdaExpression ToLambda(this Expression expression) =>
@@ -95,6 +145,20 @@ static class DictionaryExtensions
 
 public class Test
 {
+    [Fact]
+    public void Simple()
+    {
+        var input = "42 -> a";
+        Assert.Equal((ushort) 42, (new SolverA("a")).Solve(input));
+    }
+
+    [Fact]
+    public void Not()
+    {
+        var input = "0 -> b\nNOT b -> a";
+        Assert.Equal(ushort.MaxValue, (new SolverA("a")).Solve(input));
+    }
+
     [Fact]
     public void Example()
     {
@@ -108,14 +172,14 @@ y RSHIFT 2 -> g
 NOT x -> h
 NOT y -> i";
 
-        Assert.Equal((ushort)    72, new SolverA("d").Solve(input)); SolverA.Memo.Clear();
-        Assert.Equal((ushort)   507, new SolverA("e").Solve(input)); SolverA.Memo.Clear();
-        Assert.Equal((ushort)   492, new SolverA("f").Solve(input)); SolverA.Memo.Clear();
-        Assert.Equal((ushort)   114, new SolverA("g").Solve(input)); SolverA.Memo.Clear();
-        Assert.Equal((ushort) 65412, new SolverA("h").Solve(input)); SolverA.Memo.Clear();
-        Assert.Equal((ushort) 65079, new SolverA("i").Solve(input)); SolverA.Memo.Clear();
-        Assert.Equal((ushort)   123, new SolverA("x").Solve(input)); SolverA.Memo.Clear();
-        Assert.Equal((ushort)   456, new SolverA("y").Solve(input)); SolverA.Memo.Clear();
+        Assert.Equal((ushort)    72, new SolverA("d").Solve(input));
+        Assert.Equal((ushort)   507, new SolverA("e").Solve(input));
+        Assert.Equal((ushort)   492, new SolverA("f").Solve(input));
+        Assert.Equal((ushort)   114, new SolverA("g").Solve(input));
+        Assert.Equal((ushort) 65412, new SolverA("h").Solve(input));
+        Assert.Equal((ushort) 65079, new SolverA("i").Solve(input));
+        Assert.Equal((ushort)   123, new SolverA("x").Solve(input));
+        Assert.Equal((ushort)   456, new SolverA("y").Solve(input));
     }
 
     [Fact]
@@ -127,7 +191,7 @@ x -> y
 y -> z
 z -> a";
 
-        Assert.Equal((ushort) 42, new SolverA().Solve(input)); SolverA.Memo.Clear();
+        Assert.Equal((ushort) 42, new SolverA().Solve(input));
     }
 
     [Fact]
@@ -137,7 +201,7 @@ z -> a";
 1 AND gd -> ge
 5 -> gd";
 
-        Assert.Equal((ushort) 1, new SolverA("ge").Solve(input)); SolverA.Memo.Clear();
+        Assert.Equal((ushort) 1, new SolverA("ge").Solve(input));
     }
 
     [Fact(Timeout = 10000)]
@@ -168,10 +232,10 @@ t AND t -> u
 u AND u -> v
 v AND v -> w
 w AND w -> x
-y AND y -> y
-z AND z -> z
+x AND x -> y
+y AND y -> z
 ";
 
-        Assert.Equal((ushort) 42, new SolverA("z").Solve(input)); SolverA.Memo.Clear();
+        Assert.Equal((ushort) 42, new SolverA("z").Solve(input));
     }
 }
