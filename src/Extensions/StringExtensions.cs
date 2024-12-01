@@ -3,6 +3,9 @@ static class StringExtensions
     internal static string[] Lines(this string source) =>
         source.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
 
+    internal static string[] Words(this string source) =>
+        source.Split([' '], StringSplitOptions.RemoveEmptyEntries);
+
     internal static bool HasVowels(this string source, int atLeast) =>
         source.Count("aeiou".Contains) >= atLeast;
 

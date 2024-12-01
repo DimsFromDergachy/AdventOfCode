@@ -6,7 +6,7 @@ class Historian : Solver
     internal override object Solve(string input)
     {
         var (list1, list2) = input.Lines()
-             .SelectMany(line => line.Split(' ', StringSplitOptions.RemoveEmptyEntries))
+             .SelectMany(line => line.Words())
              .Select(int.Parse)
              .Chunk(2)
              .Select(nums => (nums[0], nums[1]))
@@ -31,6 +31,6 @@ public class Test
 3   9
 3   3";
 
-        Assert.Equal(11, new SolverA().Solve(input));
+        Assert.Equal(11, new Historian().Solve(input));
     }
 }
