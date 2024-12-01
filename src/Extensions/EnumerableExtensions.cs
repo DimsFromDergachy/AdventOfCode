@@ -12,6 +12,10 @@ static class EnumerableExtensions
                 yield return seed;
             }
         }
+
+    internal static (IEnumerable<T1>, IEnumerable<T2>) Unzip<T1, T2>(
+        this IEnumerable<(T1, T2)> source) =>
+            (source.Select(item => item.Item1), source.Select(item => item.Item2));
 }
 
 public class EnumerableExtensionsTest
