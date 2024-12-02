@@ -24,9 +24,9 @@ static class EnumerableExtensions
         this IEnumerable<TItem> source)
     {
         if (!source.Any())
-            throw new ArgumentException("Empty collection");
+            yield break;
 
-        // source === head ++ [elem] ++ tail
+        // Invariant: source === head ++ [elem] ++ tail
         var head = Enumerable.Empty<TItem>();
         var elem = source.First();
         var tail = source.Skip(1);
@@ -75,6 +75,9 @@ public class EnumerableExtensionsTest
     [Fact]
     public void Extract()
     {
+        var empty = new int[] {};
+        Assert.Empty(empty.Extract());
+
         var array = new int[] { 1, 2, 3, 5, 5 };
         Assert.Equal(array, array.Extract().Select(pair => pair.Item1));
         Assert.Collection(array.Extract(),
