@@ -1,5 +1,6 @@
 static class EnumerableExtensions
 {
+    // Scan [1,2,3,4,5] 0 (+) => [0,1,3,6,10,15]
     internal static IEnumerable<TAccumulate> Scan<TSource, TAccumulate>(
         this IEnumerable<TSource> source,
         TAccumulate seed,
@@ -13,10 +14,12 @@ static class EnumerableExtensions
             }
         }
 
+    // Unzip [(1, 'a'), (2, 'b'), (3, 'c')] => ([1,2,3], ['a', 'b', 'c'])
     internal static (IEnumerable<T1>, IEnumerable<T2>) Unzip<T1, T2>(
         this IEnumerable<(T1, T2)> source) =>
             (source.Select(item => item.Item1), source.Select(item => item.Item2));
 
+    // Extract [1,2,3] => [(1, [2,3]), (2, [1,3]), (3, [1,2])]
     internal static IEnumerable<(TItem, IEnumerable<TItem>)> Extract<TItem>(
         this IEnumerable<TItem> source)
     {
@@ -39,18 +42,17 @@ static class EnumerableExtensions
         }
     }
 
+    // Permutations [1,2,3] => [[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]
     internal static IEnumerable<IEnumerable<TItem>> Permutations<TItem>(
         this IEnumerable<TItem> source)
     {
         if (source.Any())
         {
-            foreach (var item in source)
+            foreach (var (item, rest) in source.Extract())
             {
-                var lists = source.Except(new List<TItem> {item})
-                                    .Permutations();
-                foreach (var list in lists)
+                foreach (var perm in rest.Permutations())
                 {
-                    yield return list.Prepend(item);
+                    yield return perm.Prepend(item);
                 }
             }
         }
