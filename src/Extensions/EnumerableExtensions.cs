@@ -46,19 +46,18 @@ static class EnumerableExtensions
     internal static IEnumerable<IEnumerable<TItem>> Permutations<TItem>(
         this IEnumerable<TItem> source)
     {
-        if (source.Any())
-        {
-            foreach (var (item, rest) in source.Extract())
-            {
-                foreach (var perm in rest.Permutations())
-                {
-                    yield return perm.Prepend(item);
-                }
-            }
-        }
-        else
+        if (!source.Any())
         {
             yield return Enumerable.Empty<TItem>();
+            yield break;
+        }
+
+        foreach (var (item, rest) in source.Extract())
+        {
+            foreach (var perm in rest.Permutations())
+            {
+                yield return perm.Prepend(item);
+            }
         }
     }
 }
@@ -68,6 +67,8 @@ public class EnumerableExtensionsTest
     [Fact]
     public void Scan()
     {
+        Assert.Equal([42], Enumerable.Empty<int>().Scan(42, null!));
+
         var array = new int[] { 1, 2, 3, 4, 5 };
         Assert.Equal([0, 1, 3, 6, 10, 15], array.Scan(0, (x, y) => x + y));
     }
@@ -75,8 +76,7 @@ public class EnumerableExtensionsTest
     [Fact]
     public void Extract()
     {
-        var empty = new int[] {};
-        Assert.Empty(empty.Extract());
+        Assert.Empty(Enumerable.Empty<int>().Extract());
 
         var array = new int[] { 1, 2, 3, 5, 5 };
         Assert.Equal(array, array.Extract().Select(pair => pair.Item1));
@@ -98,8 +98,10 @@ public class EnumerableExtensionsTest
     [Fact]
     public void Permutations()
     {
+        Assert.Equal([Enumerable.Empty<int>()],
+            Enumerable.Empty<int>().Permutations());
+
         var array = new int[] { 1, 2, 3 };
-        Assert.Equal(1 * 2 * 3, array.Permutations().Count());
         Assert.Collection(array.Permutations(),
             p1 => Assert.Equal([1, 2, 3], p1),
             p2 => Assert.Equal([1, 3, 2], p2),
