@@ -48,9 +48,8 @@ class DecorrupterDo : Solver
                 })
              .Sum;
 
-    struct Context
+    record Context
     {
-        public Context() {}
         internal bool Do { get; set; } = true;
         internal int Sum { get; set; } = 0;
     }
