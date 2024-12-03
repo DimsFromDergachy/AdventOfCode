@@ -5,7 +5,7 @@ namespace Year2024.Day03;
 [Solver(2024, 03, Part.A)]
 class Decorrupter : Solver
 {
-    Regex regex = new Regex("mul\\((\\d{1,3}),(\\d{1,3})\\)");
+    Regex regex = new Regex(@"mul\((\d{1,3}),(\d{1,3})\)");
 
     internal override object Solve(string input) =>
         regex.Matches(input)
@@ -31,7 +31,7 @@ public class DecorrupterTest
 [Solver(2024, 03, Part.B)]
 class DecorrupterDo : Solver
 {
-    Regex regex = new Regex("(do\\(\\)|don't\\(\\)|mul\\((\\d{1,3}),(\\d{1,3})\\))");
+    Regex regex = new Regex(@"(do\(\)|don't\(\)|mul\((\d{1,3}),(\d{1,3})\))");
 
     internal override object Solve(string input) =>
         regex.Matches(input)
