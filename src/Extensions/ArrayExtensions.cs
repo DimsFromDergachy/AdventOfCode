@@ -21,6 +21,13 @@ static class ArrayExtensions
 
         return array;
     }
+
+    internal static IEnumerable<(int, int)> GetIndexes<T>(this T[,] array)
+    {
+        for (int i = array.GetLowerBound(0); i <= array.GetUpperBound(0); i++)
+        for (int j = array.GetLowerBound(1); j <= array.GetUpperBound(1); j++)
+            yield return (i, j);
+    }
 }
 
 public class ArrayExtensionsTest
@@ -49,5 +56,13 @@ public class ArrayExtensionsTest
         Assert.Equal(4, array[1, 0]);
         Assert.Equal(5, array[1, 1]);
         Assert.Equal(6, array[1, 2]);
+    }
+
+    [Fact]
+    public void GetIndexes()
+    {
+        var array = new int[2,3] {{1,2,3}, {4,5,6}};
+        Assert.Equal([(0,0), (0,1), (0,2), (1,0), (1,1), (1,2)],
+            array.GetIndexes());
     }
 }

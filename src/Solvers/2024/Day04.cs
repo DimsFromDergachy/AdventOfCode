@@ -4,6 +4,9 @@ namespace Year2024.Day04;
 [Solver(2024, 04, Part.B)]
 class XMAS : Solver
 {
+    public XMAS() { }
+    internal XMAS(Part part) { Part = part; }
+
     List<(char, int, int)> maskA = new List<(char, int, int)>
     {
         ('X',  0,  0), ('M',  1,  0), ('A',  2,  0), ('S',  3,  0),
@@ -35,21 +38,18 @@ class XMAS : Solver
             Part.B => maskB.Chunk(5),
         };
 
-        return Enumerable
-                .Range(0, array.GetUpperBound(0) + 1)
-                .SelectMany(i => Enumerable.Range(0, array.GetUpperBound(1) + 1)
-                                           .Select(j => (i, j)))
-                .SelectMany(pair => masks.Select(m => (pair.i, pair.j, m)))
-                .Count(index => 
-                {
-                    var (i, j, mask) = index;
-                    try
+        return array.GetIndexes()
+                    .SelectMany(idx => masks.Select(m => (idx.Item1, idx.Item2, m)))
+                    .Count(idx => 
                     {
-                        return mask.All(maskChars => maskChars.Item1 == array[i + maskChars.Item2, j + maskChars.Item3]);
-                    } catch (IndexOutOfRangeException) {
-                        return false;
-                    }
-                });
+                        var (i, j, mask) = idx;
+                        try
+                        {
+                            return mask.All(maskChars => maskChars.Item1 == array[i + maskChars.Item2, j + maskChars.Item3]);
+                        } catch (IndexOutOfRangeException) {
+                            return false;
+                        }
+                    });
     }
 }
 
@@ -66,9 +66,7 @@ M.S
 M.S
 ";
 
-        var solver = new XMAS();
-        solver.Part = Part.B;
-        Assert.Equal(1, solver.Solve(input));
+        Assert.Equal(1, new XMAS(Part.B).Solve(input));
     }
 
     [Fact]
@@ -118,8 +116,6 @@ M.M.M.M.M.
 ..........
 ";
 
-        var solver = new XMAS();
-        solver.Part = Part.B;
-        Assert.Equal(9, solver.Solve(input));
+        Assert.Equal(9, new XMAS(Part.B).Solve(input));
     }
 }
