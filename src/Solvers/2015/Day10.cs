@@ -3,16 +3,28 @@ using System.Text;
 namespace Year2015.Day10;
 
 [Solver(2015, 10, Part.A)]
+[Solver(2015, 10, Part.B)]
 class LookAndSayGamer : Solver
 {
-    internal int Count {get; set; }= 40;
+    public LookAndSayGamer() {}
+    internal LookAndSayGamer(Part part) { Part = part; }
+
+    int Count
+    {
+        #pragma warning disable CS8524
+        get => Part switch
+        {
+            Part.A => 40,
+            Part.B => 50,
+        };
+    }
 
     internal override object Solve(string input) =>
         Enumerable.Range(0, Count)
                   .Aggregate(input, (s, _) => Step(s))
                   .Count();
 
-    string Step(string input) =>
+    internal string Step(string input) =>
         input.Group()
              .SelectMany(gr => gr.Count().ToString() + gr.First())
              .Aggregate(new StringBuilder(), (b, ch) => b.Append(ch))
@@ -27,10 +39,17 @@ public class LookAndSayGamerTest
     [InlineData("21", "1211")]
     [InlineData("1211", "111221")]
     [InlineData("111221", "312211")]
-    public void Example(string input, string expected)
+    internal void Step(string input, string expected)
     {
         var solver = new LookAndSayGamer();
-        solver.Count = 1;
-        Assert.Equal(expected, solver.Solve(input));
+        Assert.Equal(expected, solver.Step(input));
+    }
+
+    [Theory]
+    [InlineData(Part.A, "3113322113", 329356)]
+    [InlineData(Part.B, "3113322113", 4666278)]
+    internal void Example(Part part, string input, int expected)
+    {
+        Assert.Equal(expected, new LookAndSayGamer(part).Solve(input));
     }
 }
