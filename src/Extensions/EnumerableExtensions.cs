@@ -60,6 +60,27 @@ static class EnumerableExtensions
             }
         }
     }
+
+    // Group [1,1,2,1] => [[1,1], [2], [1]]
+    public static IEnumerable<List<TSource>> Group<TSource>(this IEnumerable<TSource> source)
+    {
+        var list = new List<TSource>();
+
+        foreach (var elem in source)
+        {
+            if (list.Any() && !list.First()!.Equals(elem))
+            {
+                yield return list;
+                list = new List<TSource>();
+            }
+            list.Add(elem);
+        }
+
+        if (list.Any())
+        {
+            yield return list;
+        }
+    }
 }
 
 public class EnumerableExtensionsTest
@@ -109,6 +130,19 @@ public class EnumerableExtensionsTest
             p4 => Assert.Equal([2, 3, 1], p4),
             p5 => Assert.Equal([3, 1, 2], p5),
             p6 => Assert.Equal([3, 2, 1], p6)
+        );
+    }
+
+    [Fact]
+    public void Group()
+    {
+        Assert.Empty(Enumerable.Empty<int>().Group());
+
+        var array = new int[] { 1, 1, 2, 1 };
+        Assert.Collection(array.Group(),
+            p1 => Assert.Equal([1, 1], p1),
+            p2 => Assert.Equal(   [2], p2),
+            p3 => Assert.Equal(   [1], p3)
         );
     }
 }
