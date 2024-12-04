@@ -41,8 +41,7 @@ public class LookAndSayGamerTest
     [InlineData("111221", "312211")]
     internal void Step(string input, string expected)
     {
-        var solver = new LookAndSayGamer();
-        Assert.Equal(expected, solver.Step(input));
+        Assert.Equal(expected, new LookAndSayGamer().Step(input));
     }
 
     [Theory]

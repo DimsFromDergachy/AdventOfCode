@@ -4,6 +4,9 @@ namespace Year2024.Day01;
 [Solver(2024, 01, Part.B)]
 class Historian : Solver
 {
+    public Historian() {}
+    internal Historian(Part part) { Part = part; }
+
     internal override object Solve(string input)
     {
         var (list1, list2) = input.Lines()
@@ -49,10 +52,7 @@ public class Test
 3   9
 3   3";
 
-        var solver = new Historian();
-        Assert.Equal(11, solver.Solve(input));
-
-        solver.Part = Part.B;
-        Assert.Equal(31, solver.Solve(input));
+        Assert.Equal(11, new Historian(Part.A).Solve(input));
+        Assert.Equal(31, new Historian(Part.B).Solve(input));
     }
 }

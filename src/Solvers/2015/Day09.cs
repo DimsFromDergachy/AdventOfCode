@@ -6,6 +6,9 @@ namespace Year2015.Day09;
 [Solver(2015, 09, Part.B)]
 class SalesSanta : Solver
 {
+    public SalesSanta() {}
+    internal SalesSanta(Part part) { Part = part; }
+
     Regex regex = new Regex("(\\w+) to (\\w+) = (\\d+)");
 
     internal override object Solve(string input)
@@ -46,16 +49,14 @@ class SalesSanta : Solver
 public class SalesSantaTest
 {
     [Fact]
-    public void Example()
+    internal void Example()
     {
         var input = @"
 London to Dublin = 464
 London to Belfast = 518
 Dublin to Belfast = 141";
 
-        Assert.Equal(605, new SalesSanta().Solve(input));
-        var solver = new SalesSanta();
-        solver.Part = Part.B;
-        Assert.Equal(982, solver.Solve(input));
+        Assert.Equal(605, new SalesSanta(Part.A).Solve(input));
+        Assert.Equal(982, new SalesSanta(Part.B).Solve(input));
     }
 }
