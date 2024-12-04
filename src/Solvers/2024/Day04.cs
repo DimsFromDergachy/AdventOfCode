@@ -4,104 +4,52 @@ namespace Year2024.Day04;
 [Solver(2024, 04, Part.B)]
 class XMAS : Solver
 {
-    record Coord { internal int X; internal int Y; }
-
-    List<(int, int)> ds = new List<(int, int)>
-        { (1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1) };
-
-    List<List<(Coord, char)>> masks = new List<List<(Coord, char)>>
+    List<(char, int, int)> maskA = new List<(char, int, int)>
     {
-        new List<(Coord, char)>
-        {
-            (new Coord { X = -1, Y = -1}, 'M'),
-            (new Coord { X =  0, Y =  0}, 'A'),
-            (new Coord { X = +1, Y = +1}, 'S'),
-            (new Coord { X = +1, Y = -1}, 'M'),
-            (new Coord { X =  0, Y =  0}, 'A'),
-            (new Coord { X = -1, Y = +1}, 'S'),
-        },
-        new List<(Coord, char)>
-        {
-            (new Coord { X = -1, Y = -1}, 'M'),
-            (new Coord { X =  0, Y =  0}, 'A'),
-            (new Coord { X = +1, Y = +1}, 'S'),
-            (new Coord { X = -1, Y = +1}, 'M'),
-            (new Coord { X =  0, Y =  0}, 'A'),
-            (new Coord { X = +1, Y = -1}, 'S'),
-        },
-        new List<(Coord, char)>
-        {
-            (new Coord { X = +1, Y = +1}, 'M'),
-            (new Coord { X =  0, Y =  0}, 'A'),
-            (new Coord { X = -1, Y = -1}, 'S'),
-            (new Coord { X = +1, Y = -1}, 'M'),
-            (new Coord { X =  0, Y =  0}, 'A'),
-            (new Coord { X = -1, Y = +1}, 'S'),
-        },
-        new List<(Coord, char)>
-        {
-            (new Coord { X = +1, Y = +1}, 'M'),
-            (new Coord { X =  0, Y =  0}, 'A'),
-            (new Coord { X = -1, Y = -1}, 'S'),
-            (new Coord { X = -1, Y = +1}, 'M'),
-            (new Coord { X =  0, Y =  0}, 'A'),
-            (new Coord { X = +1, Y = -1}, 'S'),
-        },
+        ('X',  0,  0), ('M',  1,  0), ('A',  2,  0), ('S',  3,  0),
+        ('X',  0,  0), ('M',  1,  1), ('A',  2,  2), ('S',  3,  3),
+        ('X',  0,  0), ('M',  0,  1), ('A',  0,  2), ('S',  0,  3),
+        ('X',  0,  0), ('M', -1,  1), ('A', -2,  2), ('S', -3,  3),
+        ('X',  0,  0), ('M', -1,  0), ('A', -2,  0), ('S', -3,  0),
+        ('X',  0,  0), ('M', -1, -1), ('A', -2, -2), ('S', -3, -3),
+        ('X',  0,  0), ('M',  0, -1), ('A',  0, -2), ('S',  0, -3),
+        ('X',  0,  0), ('M',  1, -1), ('A',  2, -2), ('S',  3, -3),
     };
 
+    List<(char, int, int)> maskB = new List<(char, int, int)>
+    {
+        ('M', -1, -1), ('M', +1, -1), ('A', 0, 0), ('S', +1, +1), ('S', -1, +1),
+        ('M', -1, -1), ('M', -1, +1), ('A', 0, 0), ('S', +1, +1), ('S', +1, -1),
+        ('M', +1, +1), ('M', +1, -1), ('A', 0, 0), ('S', -1, -1), ('S', -1, +1),
+        ('M', +1, +1), ('M', -1, +1), ('A', 0, 0), ('S', -1, -1), ('S', +1, -1),
+    };
 
     internal override object Solve(string input)
     {
-        var lines = input.Lines();
-        var n = lines.Count();
-        var m = lines.First().Count();
+        var array = input.Lines().ToArray();
 
-        var array = new char[n, m];
-
-        var x = 0;
-        foreach (var line in lines)
+        #pragma warning disable CS8524
+        var masks = Part switch
         {
-            var y = 0;
-            foreach (var ch in line)
-            {
-                array[x, y] = ch;
-                y++;
-            }
-            x++;
-        }
+            Part.A => maskA.Chunk(4),
+            Part.B => maskB.Chunk(5),
+        };
 
-        int res = 0;
-        for (int i = 0; i < n; i++)
-            for (int j = 0; j < m; j++)
-                if (Part == Part.A)
-                    foreach (var (dx, dy) in ds)
-                        try
-                        {
-                            if ('X' == array[i + 0 * dx, j + 0 * dy]
-                                    &&
-                                'M' == array[i + 1 * dx, j + 1 * dy]
-                                    &&
-                                'A' == array[i + 2 * dx, j + 2 * dy]
-                                    &&
-                                'S' == array[i + 3 * dx, j + 3 * dy])
-                            {
-                                res++;
-                            }
-                        }
-                        catch (IndexOutOfRangeException) {}
-                else
-                    foreach (var mask in masks)
-                        try
-                        {
-                            var good = true;
-                            foreach (var (coord, ch) in mask)
-                                if (array[i + coord.X, j + coord.Y] != ch)
-                                    good = false;
-                            if (good) res++;
-                        } catch (IndexOutOfRangeException) {}
-
-
-        return res;
+        return Enumerable
+                .Range(0, array.GetUpperBound(0) + 1)
+                .SelectMany(i => Enumerable.Range(0, array.GetUpperBound(1) + 1)
+                                           .Select(j => (i, j)))
+                .SelectMany(pair => masks.Select(m => (pair.i, pair.j, m)))
+                .Count(index => 
+                {
+                    var (i, j, mask) = index;
+                    try
+                    {
+                        return mask.All(maskChars => maskChars.Item1 == array[i + maskChars.Item2, j + maskChars.Item3]);
+                    } catch (IndexOutOfRangeException) {
+                        return false;
+                    }
+                });
     }
 }
 
