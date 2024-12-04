@@ -7,7 +7,7 @@ class XMAS : Solver
     public XMAS() { }
     internal XMAS(Part part) { Part = part; }
 
-    List<(char, int, int)> maskA = new List<(char, int, int)>
+    List<(char ch, int dx, int dy)> maskA = new List<(char, int, int)>
     {
         ('X',  0,  0), ('M',  1,  0), ('A',  2,  0), ('S',  3,  0),
         ('X',  0,  0), ('M',  1,  1), ('A',  2,  2), ('S',  3,  3),
@@ -19,7 +19,7 @@ class XMAS : Solver
         ('X',  0,  0), ('M',  1, -1), ('A',  2, -2), ('S',  3, -3),
     };
 
-    List<(char, int, int)> maskB = new List<(char, int, int)>
+    List<(char ch, int dx, int dy)> maskB = new List<(char, int, int)>
     {
         ('M', -1, -1), ('M', +1, -1), ('A', 0, 0), ('S', +1, +1), ('S', -1, +1),
         ('M', -1, -1), ('M', -1, +1), ('A', 0, 0), ('S', +1, +1), ('S', +1, -1),
@@ -45,7 +45,7 @@ class XMAS : Solver
                         var (i, j, mask) = idx;
                         try
                         {
-                            return mask.All(maskChars => maskChars.Item1 == array[i + maskChars.Item2, j + maskChars.Item3]);
+                            return mask.All(maskChars => maskChars.ch == array[i + maskChars.dx, j + maskChars.dy]);
                         } catch (IndexOutOfRangeException) {
                             return false;
                         }
