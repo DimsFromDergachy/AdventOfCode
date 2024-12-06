@@ -81,6 +81,19 @@ static class EnumerableExtensions
             yield return list;
         }
     }
+
+    // Cycle [1,2,3,4] => [1,2,3,4,1,2,3,4,1,2,3,4, ... ]
+    internal static IEnumerable<TSource> Cycle<TSource>(this IEnumerable<TSource> source)
+    {
+        if (!source.Any())
+            throw new ArgumentException("empty collection");
+
+        while (true)
+        {
+            foreach (var item in source)
+                yield return item;
+        }
+    }
 }
 
 public class EnumerableExtensionsTest
