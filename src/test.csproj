@@ -23,4 +23,9 @@
     <None Update="./Solvers/2024/Input/Day05" CopyToOutputDirectory="Always" />
   </ItemGroup>
 
+  <PropertyGroup>
+    <!-- The entry point of the program is global code -->
+    <NoWarn>7022</NoWarn>
+  </PropertyGroup>
+
 </Project>
