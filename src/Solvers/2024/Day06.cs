@@ -1,10 +1,11 @@
 namespace Year2024.Day06;
 
 [Solver(2024, 06, Part.A)]
+[Solver(2024, 06, Part.B)]
 class Guard : Solver
 {
-    new List<(int dx, int dy)> dirs = new List<(int, int)>
-        {(-1, 0), (0, 1), (0, +1), (+1, 0)};
+    public Guard() {}
+    internal Guard(Part part) { Part = part; }
 
     internal override object Solve(string input)
     {
@@ -16,7 +17,13 @@ class Guard : Solver
                        .First(pair => pair.Second == '^')
                        .First;
 
-        return GuardPath(map, start).Distinct().Count();
+        #pragma warning disable CS8524
+        return Part switch
+        {
+            Part.A => GuardPath(map, start).Distinct().Count(),
+            Part.B => GuardObstacles(map, start).Count(),
+            //Part.B => string.Join(",", GuardObstacles(map, start)),
+        };
     }
 
     IEnumerable<(int, int)> GuardPath(char[,] map, (int x, int y) start)
@@ -45,6 +52,25 @@ class Guard : Solver
             }
 
             yield return start;
+        }
+    }
+
+    bool CheckLoop(char[,] map, (int x, int y) start)
+    {
+        var size = map.GetLength(0) * map.GetLength(1);
+        return GuardPath(map, start).Skip(size).Any();
+    }
+
+    IEnumerable<(int x, int y)> GuardObstacles(char[,] map, (int x, int y) start)
+    {
+        foreach (var (x, y) in map.GetIndexes())
+        {
+            if (map[x, y] != '.')
+                continue;
+            map[x, y] = '#';
+            if (CheckLoop(map, start))
+                yield return (x, y);
+            map[x, y] = '.';
         }
     }
 }
@@ -76,6 +102,7 @@ public class GuardTest
 #.........
 ......#...";
 
-        Assert.Equal(41, new Guard().Solve(input));
+        Assert.Equal(41, new Guard(Part.A).Solve(input));
+        Assert.Equal( 6, new Guard(Part.B).Solve(input));
     }
 }
