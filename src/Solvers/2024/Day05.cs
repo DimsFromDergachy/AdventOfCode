@@ -1,6 +1,7 @@
 namespace Year2024.Day05;
 
 [Solver(2024, 05, Part.A)]
+[Solver(2024, 05, Part.B)]
 class PrintHelper : Solver
 {
     internal override object Solve(string input)
@@ -8,17 +9,15 @@ class PrintHelper : Solver
         var lines = input.Lines(StringSplitOptions.None);
 
         var rules = lines.TakeWhile(line => !line.Equals(string.Empty))
-                         .Select(line => line.Split('|')
-                                             .Select(word => int.Parse(word)))
-                         .Select(rule => (rule.First(), rule.Skip(1).First()));
+                         .SelectMany(line => line.Split('|'))
+                         .Select(int.Parse)
+                         .Chunk(2)
+                         .Select(rule => (rule[0], rule[1]));
         var updates = lines.SkipWhile(line => !line.Equals(string.Empty))
                            .Skip(1)
                            .TakeWhile(line => !line.Equals(string.Empty))
                            .Select(line => line.Split(',')
                                                .Select(word => int.Parse(word)));
-
-        Console.WriteLine($"r: {rules.Count()}");
-        Console.WriteLine($"u: {updates.Count()}");
 
         return updates.Where(update => CheckUpdate(rules, update))
                       .Select(update => update.Skip(update.Count() / 2).First())
