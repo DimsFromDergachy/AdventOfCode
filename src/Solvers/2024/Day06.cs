@@ -21,7 +21,7 @@ class Guard : Solver
         return Part switch
         {
             Part.A => GuardPath(map, start).Distinct().Count(),
-            Part.B => GuardObstacles(map, start).Count(),
+            Part.B => GuardObstacles(map, start).Distinct().Count(),
             //Part.B => string.Join(",", GuardObstacles(map, start)),
         };
     }
@@ -63,14 +63,51 @@ class Guard : Solver
 
     IEnumerable<(int x, int y)> GuardObstacles(char[,] map, (int x, int y) start)
     {
-        foreach (var (x, y) in map.GetIndexes())
+        var start_ = start;
+        List<(int x, int y)> path = new List<(int, int)> { start };
+
+        var dirs = new List<(int dx, int dy)>
+            {(-1, 0), (0, 1), (1, 0), (0, -1)}.Cycle();
+
+        (int x, int y)? obstacle = null;
+
+        while (true)
         {
-            if (map[x, y] != '.')
-                continue;
-            map[x, y] = '#';
-            if (CheckLoop(map, start))
-                yield return (x, y);
-            map[x, y] = '.';
+            var dir = dirs.First();
+            var next = (start.x + dir.dx, start.y + dir.dy);
+
+            try
+            {
+                if (map[next.Item1, next.Item2] == '#')
+                {
+                    dirs = dirs.Skip(1);
+                    continue;
+                }
+
+                if (path.Contains(start)
+                    ||
+                    start.y == start_.y && start.x >= start_.x)
+                {
+                    map[next.Item1, next.Item2] = '#';
+                    if (CheckLoop(map, start_))
+                        obstacle = next;
+                    map[next.Item1, next.Item2] = '.';
+                }
+
+                start = next;
+
+            } catch(IndexOutOfRangeException)
+            {
+                yield break;
+            }
+
+            if (obstacle != null)
+            {
+                yield return obstacle.Value;
+                obstacle = null;
+            }
+
+            path.Add(start);
         }
     }
 }
@@ -84,7 +121,24 @@ public class GuardTest
 #..
 ^.#
 .#.";
-        Assert.Equal(2, new Guard().Solve(input));
+        Assert.Equal(2, new Guard(Part.A).Solve(input));
+        Assert.Equal(0, new Guard(Part.B).Solve(input));
+    }
+
+    [Fact]
+    internal void Simple2()
+    {
+        var input = @"
+..#.
+#...
+...#
+^...
+....
+.#..
+..#.
+";
+        Assert.Equal(9, new Guard(Part.A).Solve(input));
+        Assert.Equal(2, new Guard(Part.B).Solve(input));
     }
 
     [Fact]
