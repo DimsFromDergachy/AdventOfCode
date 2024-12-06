@@ -19,4 +19,8 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="./Solvers/2024/Input/Day05" CopyToOutputDirectory="Always" />
+  </ItemGroup>
+
 </Project>
