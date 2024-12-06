@@ -4,6 +4,9 @@ namespace Year2024.Day05;
 [Solver(2024, 05, Part.B)]
 class PrintHelper : Solver
 {
+    public PrintHelper() {}
+    internal PrintHelper(Part part) { Part = part; }
+
     internal override object Solve(string input)
     {
         var lines = input.Lines(StringSplitOptions.None);
@@ -19,9 +22,18 @@ class PrintHelper : Solver
                            .Select(line => line.Split(',')
                                                .Select(word => int.Parse(word)));
 
-        return updates.Where(update => CheckUpdate(rules, update))
-                      .Select(update => update.Skip(update.Count() / 2).First())
-                      .Sum();
+        #pragma warning disable CS8524
+        return Part switch
+        {
+            Part.A => updates.Where(update => CheckUpdate(rules, update))
+                             .Select(update => update.Skip(update.Count() / 2).First())
+                             .Sum(),
+            Part.B => updates.Where(update => !CheckUpdate(rules, update))
+                             .Select(update => update.ToArray())
+                             .Select(update => FixUpdate(rules, update))
+                             .Select(update => update.Skip(update.Count() / 2).First())
+                             .Sum(),
+        };
     }
 
     bool CheckUpdate(IEnumerable<(int, int)> rules, IEnumerable<int> update)
@@ -32,6 +44,28 @@ class PrintHelper : Solver
     bool FailRule((int a, int b) rule, IEnumerable<int> update)
     {
         return update.SkipWhile(x => x != rule.b).Any(x => x == rule.a);
+    }
+
+    int[] FixUpdate(IEnumerable<(int a, int b)> rules, int[] update)
+    {
+        if (CheckUpdate(rules, update))
+            return update;
+
+        foreach (var rule in rules)
+        {
+            for (int i = 0; i < update.Length; i++)
+            {
+                if (update[i] != rule.b)
+                    continue;
+                for (int j = i + 1; j < update.Length; j++)
+                    if (update[j] == rule.a)
+                    {
+                        (update[i], update[j]) = (update[j], update[i]);
+                        break;
+                    }
+            }
+        }
+        return FixUpdate(rules, update);
     }
 }
 
@@ -70,7 +104,8 @@ public class PrintHelperTest
 61,13,29
 97,13,75,29,47";
 
-        Assert.Equal(143, new PrintHelper().Solve(input));
+        Assert.Equal(143, new PrintHelper(Part.A).Solve(input));
+        Assert.Equal(123, new PrintHelper(Part.B).Solve(input));
     }
 
     [Fact]
@@ -78,6 +113,7 @@ public class PrintHelperTest
     {
         var input = File.ReadAllText("./Solvers/2024/Input/Day05");
 
-        Assert.Equal(7074, new PrintHelper().Solve(input));
+        Assert.Equal(7074, new PrintHelper(Part.A).Solve(input));
+        Assert.Equal(4828, new PrintHelper(Part.B).Solve(input));
     }
 }
