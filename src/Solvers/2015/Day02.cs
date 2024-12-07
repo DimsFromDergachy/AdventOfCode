@@ -4,9 +4,8 @@ namespace Year2015.Day02;
 class SolverA : Solver
 {
     internal override object Solve(string input) =>
-        input.Split(['x', '\r', '\n'], StringSplitOptions.RemoveEmptyEntries)
-             .Select(int.Parse)
-             .Chunk(3)
+        input.Lines()
+             .Select(line => line.Parse<int>('x').ToArray())
              .Select(Wrapping)
              .Sum();
 
@@ -22,9 +21,8 @@ class SolverA : Solver
 class SolverB : Solver
 {
     internal override object Solve(string input) =>
-        input.Split(['x', '\r', '\n'], StringSplitOptions.RemoveEmptyEntries)
-             .Select(int.Parse)
-             .Chunk(3)
+        input.Lines()
+             .Select(line => line.Parse<int>('x').ToArray())
              .Select(Ribboning)
              .Sum();
 
@@ -33,5 +31,19 @@ class SolverB : Solver
         var (a, b, c) = (args[0], args[1], args[2]);
         return 2 * (a + b + c - args.Max())
                  + (a * b * c);
+    }
+}
+
+public class SolverTest
+{
+    [Fact]
+    internal void Example()
+    {
+        var input = @"
+2x3x4
+1x1x10";
+
+        Assert.Equal(101, new SolverA().Solve(input));
+        Assert.Equal( 48, new SolverB().Solve(input));
     }
 }

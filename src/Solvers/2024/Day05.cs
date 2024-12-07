@@ -12,15 +12,13 @@ class PrintHelper : Solver
         var lines = input.Lines(StringSplitOptions.None);
 
         var rules = lines.TakeWhile(line => !line.Equals(string.Empty))
-                         .SelectMany(line => line.Split('|'))
-                         .Select(int.Parse)
+                         .SelectMany(line => line.Parse<int>('|'))
                          .Chunk(2)
                          .Select(rule => (rule[0], rule[1]));
         var updates = lines.SkipWhile(line => !line.Equals(string.Empty))
                            .Skip(1)
                            .TakeWhile(line => !line.Equals(string.Empty))
-                           .Select(line => line.Split(',')
-                                               .Select(word => int.Parse(word)));
+                           .Select(line => line.Parse<int>(','));
 
         #pragma warning disable CS8524
         return Part switch

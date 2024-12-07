@@ -13,12 +13,10 @@ class Repairer : Solver
              .Where(eq => Check(eq.result, eq.args))
              .Sum(eq => eq.result);
 
-    (long result, long[] args) Parse(string line) =>
-            (long.Parse(line.Substring(0, line.IndexOf(':'))),
-             line.Substring(2 + line.IndexOf(':'))
-                 .Words()
-                 .Select(long.Parse)
-                 .ToArray());
+    (long result, long[] args) Parse(string line) => (
+        result: long.Parse(line.Split(':')[0]),
+        args: line.Split(':')[1].Parse<long>().ToArray()
+    );
 
     bool Check(long exp, long[] args) => Results(exp, 0, args).Any(r => r == exp);
 

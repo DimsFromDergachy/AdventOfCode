@@ -10,8 +10,7 @@ class Historian : Solver
     internal override object Solve(string input)
     {
         var (list1, list2) = input.Lines()
-             .SelectMany(line => line.Words())
-             .Select(int.Parse)
+             .SelectMany(line => line.Parse<int>())
              .Chunk(2)
              .Select(nums => (nums[0], nums[1]))
              .Unzip();
