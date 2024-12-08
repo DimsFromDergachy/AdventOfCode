@@ -1,14 +1,5 @@
 static class ArrayExtensions
 {
-    internal static IEnumerable<T> ToEnumerable<T>(this T[,] array)
-    {
-        var enumerator = array.GetEnumerator();
-        while (enumerator.MoveNext())
-        {
-            yield return (T) enumerator.Current;
-        }
-    }
-
     internal static T[,] ToArray<T>(this IEnumerable<IEnumerable<T>> source)
     {
         var n = source.Count();
@@ -22,23 +13,29 @@ static class ArrayExtensions
         return array;
     }
 
-    internal static IEnumerable<(int, int)> GetIndexes<T>(this T[,] array)
+    internal static IEnumerable<((int i, int j) Index, T Value)> ToEnumerable<T>(this T[,] array) =>
+        array.GetIndexes()
+             .Zip(array.GetValues());
+
+    internal static IEnumerable<(int i, int j)> GetIndexes<T>(this T[,] array)
     {
         for (int i = array.GetLowerBound(0); i <= array.GetUpperBound(0); i++)
         for (int j = array.GetLowerBound(1); j <= array.GetUpperBound(1); j++)
             yield return (i, j);
     }
+
+    internal static IEnumerable<T> GetValues<T>(this T[,] array)
+    {
+        var enumerator = array.GetEnumerator();
+        while (enumerator.MoveNext())
+        {
+            yield return (T) enumerator.Current;
+        }
+    }
 }
 
 public class ArrayExtensionsTest
 {
-    [Fact]
-    public void ToEnumerable()
-    {
-        var array = new int[3,3] {{1,2,3}, {4,5,6}, {7,8,9}};
-        Assert.Equal(45, array.ToEnumerable().Sum());
-    }
-
     [Fact]
     public void ToArray()
     {
@@ -59,10 +56,11 @@ public class ArrayExtensionsTest
     }
 
     [Fact]
-    public void GetIndexes()
+    public void ToEnumerable()
     {
         var array = new int[2,3] {{1,2,3}, {4,5,6}};
-        Assert.Equal([(0,0), (0,1), (0,2), (1,0), (1,1), (1,2)],
-            array.GetIndexes());
+        Assert.Equal([((0, 0), 1), ((0, 1), 2), ((0, 2), 3),
+                      ((1, 0), 4), ((1, 1), 5), ((1, 2), 6)],
+            array.ToEnumerable());
     }
 }

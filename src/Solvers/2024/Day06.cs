@@ -13,7 +13,7 @@ class Guard : Solver
                        .ToArray();
 
         var start = map.GetIndexes()
-                       .Zip(map.ToEnumerable())
+                       .Zip(map.GetValues())
                        .First(pair => pair.Second == '^')
                        .First;
 
