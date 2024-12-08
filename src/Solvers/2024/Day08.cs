@@ -12,14 +12,6 @@ class Resonant : Solver
         var map = input.Lines()
                        .ToArray();
 
-        var x = map.ToEnumerable()
-                         .Where(kvp => kvp.Value != '.')
-                         .GroupBy(kvp => kvp.Value)
-                         .Select(group => group.Select(kvp => kvp.Index))
-                         .SelectMany(ps => ps.SelectMany(p1 => ps.SelectMany(p2 => Interferes(p1, p2))))
-                         .Where(p => OnMap(map, p))
-                         .Distinct(); 
-
         #pragma warning disable CS8524
         return Part switch
         {
