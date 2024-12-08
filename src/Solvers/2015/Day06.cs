@@ -13,7 +13,7 @@ class LightController : Solver
     internal override object Solve(string input) =>
         input.Lines()
              .Aggregate(Start, DoInstruction)
-             .ToEnumerable()
+             .GetValues()
              .Count(light => light);
 
     bool[,] DoInstruction(bool[,] lights, string instruction)
@@ -53,7 +53,7 @@ class LightController2 : Solver
     internal override object Solve(string input) =>
         input.Lines()
              .Aggregate(Start, DoInstruction)
-             .ToEnumerable()
+             .GetValues()
              .Sum();
 
     int[,] DoInstruction(int[,] lights, string instruction)
