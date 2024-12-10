@@ -29,30 +29,30 @@ class Hiker : Solver
                          .Where(pair => pair.Value == '0')
                          .Select(pair => pair.Index)
                          .Select(index => GetTrailTails(map, index))
-                         .Select(trails => trails.GroupBy(trial => trial.pos))
-                         .Select(groups => groups.Select(group => group.MaxBy(trail => trail.score)))
-                         .SelectMany(groups => groups.Select(trail => trail.score))
+                         .SelectMany(tails => tails.GroupBy(tail => tail.pos)
+                                                   .Select(gr => gr.MaxBy(trail => trail.score)))
+                                                   .Select(tail => tail.score)
                          .Sum(),
         };
     }
 
     IEnumerable<((int x, int y) pos, int score)> GetTrailTails(char[,] map, (int x, int y) start)
     {
-        int[,] visited = new int[map.GetLength(0), map.GetLength(1)];
+        int[,] scores = new int[map.GetLength(0), map.GetLength(1)];
 
-        visited[start.x, start.y] = 1;
+        scores[start.x, start.y] = 1;
         var stack = new Stack<(int x, int y)>();
         stack.Push(start);
 
-        while (stack.Count > 0)
+        while (stack.Any())
         {
             var current = stack.Pop();
-            visited[current.x, current.y]++;
+            scores[current.x, current.y]++;
             var height = map[current.x, current.y];
 
             if (height == '9')
             {
-                yield return (current, visited[current.x, current.y]);
+                yield return (current, scores[current.x, current.y]);
                 continue;
             }
 
@@ -71,7 +71,7 @@ class Hiker : Solver
     }
 }
 
-public class ATest
+public class HikerTest
 {
     [Fact]
     internal void Test()
