@@ -15,15 +15,25 @@ class Hiker : Solver
         var map = input.Lines()
                        .ToArray();
 
-        return map.ToEnumerable()
-                  .Where(pair => pair.Value == '0')
-                  .Select(pair => pair.Index)
-                  .Select(index => GetTrailTails(map, index))
-                //   .Select(tails => tails.Distinct().Count())
-                   .Select(trails => trails.GroupBy(trial => trial.pos))
-                  .Select(groups => groups.Select(group => group.MaxBy(trail => trail.score)))
-                  .SelectMany(groups => groups.Select(trail => trail.score))
-                  .Sum();
+        #pragma warning disable CS8524
+        return Part switch
+        {
+            Part.A => map.ToEnumerable()
+                         .Where(pair => pair.Value == '0')
+                         .Select(pair => pair.Index)
+                         .Select(index => GetTrailTails(map, index))
+                         .Select(tails => tails.DistinctBy(tail => tail.pos)
+                                               .Count())
+                         .Sum(),
+            Part.B => map.ToEnumerable()
+                         .Where(pair => pair.Value == '0')
+                         .Select(pair => pair.Index)
+                         .Select(index => GetTrailTails(map, index))
+                         .Select(trails => trails.GroupBy(trial => trial.pos))
+                         .Select(groups => groups.Select(group => group.MaxBy(trail => trail.score)))
+                         .SelectMany(groups => groups.Select(trail => trail.score))
+                         .Sum(),
+        };
     }
 
     IEnumerable<((int x, int y) pos, int score)> GetTrailTails(char[,] map, (int x, int y) start)
@@ -76,7 +86,7 @@ public class ATest
 01329801
 10456732";
 
-        // Assert.Equal(36, new Hiker(Part.A).Solve(input));
+        Assert.Equal(36, new Hiker(Part.A).Solve(input));
         Assert.Equal(81, new Hiker(Part.B).Solve(input));
     }
 
@@ -92,6 +102,7 @@ public class ATest
 ..8765.
 ..9....";
 
+        Assert.Equal(1, new Hiker(Part.A).Solve(input));
         Assert.Equal(3, new Hiker(Part.B).Solve(input));
     }
 }
