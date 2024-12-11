@@ -1,12 +1,22 @@
 namespace Year2024.Day11;
 
 [Solver(2024, 11, Part.A)]
+[Solver(2024, 11, Part.B)]
 class Blinker : Solver
 {
-    int Blink = 25;
+    int Blink = 75;
 
     public Blinker() {}
     internal Blinker(int blink) { Blink = blink; }
+    internal Blinker(Part part)
+    {
+        Part = part;
+        #pragma warning disable CS8524
+        Blink = part switch {
+            Part.A => 25,
+            Part.B => 75,
+        };
+    }
 
     internal override object Solve(string input) =>
         input.Parse<int>()
@@ -14,9 +24,9 @@ class Blinker : Solver
              .Sum();
 
 
-    Dictionary<(long stone, int blink), int> memo = new Dictionary<(long, int), int>();
+    Dictionary<(long stone, long blink), long> memo = new Dictionary<(long, long), long>();
 
-    int Dyno(long stone, int blink)
+    long Dyno(long stone, long blink)
     {
         if (blink == 0)
             return 1;
@@ -30,8 +40,8 @@ class Blinker : Solver
         {
             (0, _) => new long[] {1},
             (long n, string s) when s.Count() % 2 == 1 => [n * 2024],
-            (long n, string s) => [int.Parse(s.Substring(0, s.Count() / 2)),
-                                   int.Parse(s.Substring(s.Count() / 2))],
+            (long n, string s) => [long.Parse(s.Substring(0, s.Count() / 2)),
+                                   long.Parse(s.Substring(s.Count() / 2))],
         };
 
         return memo[(stone, blink)] = split.Select(stone => Dyno(stone, blink - 1))
