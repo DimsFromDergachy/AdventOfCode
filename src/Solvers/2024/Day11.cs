@@ -64,6 +64,6 @@ public class BlinkerTest
     internal void Example(int blink, int expected)
     {
         var input = @"125 17";
-        Assert.Equal(expected, new Blinker(blink).Solve(input));
+        Assert.Equal((long)expected, new Blinker(blink).Solve(input));
     }
 }
