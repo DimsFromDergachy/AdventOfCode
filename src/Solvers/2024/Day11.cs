@@ -64,4 +64,12 @@ public class BlinkerTest
         var input = @"125 17";
         Assert.Equal((long)expected, new Blinker(blink).Solve(input));
     }
+
+    [Fact]
+    internal void Puzzle()
+    {
+        var input = @"28591 78 0 3159881 4254 524155 598 1";
+        Assert.Equal(         220722L, new Blinker(Part.A).Solve(input));
+        Assert.Equal(261952051690787L, new Blinker(Part.B).Solve(input));
+    }
 }

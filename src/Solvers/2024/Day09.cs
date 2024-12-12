@@ -121,4 +121,11 @@ public class ATest
         Assert.Equal((long)1928, new Defragmenter(Part.A).Solve(input));
         Assert.Equal((long)2858, new Defragmenter(Part.B).Solve(input));
     }
+
+    [Fact]
+    internal void CheckCornerCase()
+    {
+        var input = @"211" + "0";
+        Assert.Equal((long)2, new Defragmenter(Part.A).Solve(input));
+    }
 }
