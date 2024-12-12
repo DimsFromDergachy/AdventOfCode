@@ -4,6 +4,8 @@ namespace Year2024.Day12;
 [Solver(2024, 12, Part.B)]
 class Gardener : Solver
 {
+    internal Gardener(Part part) : base(part) {}
+
     List<(int dx, int dy)> dirs = new List<(int dx, int dy)>
         { (0, 1), (1, 0), (-1, 0), (0, -1) };
 
@@ -12,7 +14,7 @@ class Gardener : Solver
         var map = input.Lines()
                        .ToArray();
 
-        return Solve(map).Select(pair => (long) ((long)pair.area) * ((long)pair.perimeter)).Sum();
+        return Solve(map).Sum(pair => pair.area * pair.perimeter);
     }
 
     IEnumerable<(int area, int perimeter)> Solve(char[,] map)
@@ -91,59 +93,65 @@ class Gardener : Solver
                 }
             }
 
-            var hs1 = fences.GroupBy(fence => fence.dir)
-                            .First(gr => gr.Key == (+1, 0))
-                            .Select(fence => fence.point)
-                            .GroupBy(fence => fence.y)
-                            .Select(gr => gr.OrderBy(fence => fence.x))
-                            .Select(gr => gr.Aggregate((-2, 0), (res, point) => {
-                                if (res.Item1 + 1 < point.x)
-                                    return (point.x, res.Item2 + 1);
-                                else
-                                    return (point.x, res.Item2);
-                                }))
-                           .Sum(gr => gr.Item2);
+            if (Part == Part.A)
+                yield return (area, 4 * area + perimeter);
 
-            var hs2 = fences.GroupBy(fence => fence.dir)
-                            .First(gr => gr.Key == (-1, 0))
-                            .Select(fence => fence.point)
-                            .GroupBy(fence => fence.y)
-                            .Select(gr => gr.OrderBy(fence => fence.x))
-                            .Select(gr => gr.Aggregate((-2, 0), (res, point) => {
-                                if (res.Item1 + 1 < point.x)
-                                    return (point.x, res.Item2 + 1);
-                                else
-                                    return (point.x, res.Item2);
-                                }))
-                           .Sum(gr => gr.Item2);
-
-            var vs1 = fences.GroupBy(fence => fence.dir)
-                            .First(gr => gr.Key == (0, +1))
-                            .Select(fence => fence.point)
-                            .GroupBy(fence => fence.x)
-                            .Select(gr => gr.OrderBy(fence => fence.y))
-                            .Select(gr => gr.Aggregate((-2, 0), (res, point) => {
-                                if (res.Item1 + 1 < point.y)
-                                    return (point.y, res.Item2 + 1);
-                                else
-                                    return (point.y, res.Item2);
-                                }))
+            if (Part == Part.B)
+            {
+                var hs1 = fences.GroupBy(fence => fence.dir)
+                                .First(gr => gr.Key == (+1, 0))
+                                .Select(fence => fence.point)
+                                .GroupBy(fence => fence.y)
+                                .Select(gr => gr.OrderBy(fence => fence.x))
+                                .Select(gr => gr.Aggregate((-2, 0), (res, point) => {
+                                    if (res.Item1 + 1 < point.x)
+                                        return (point.x, res.Item2 + 1);
+                                    else
+                                        return (point.x, res.Item2);
+                                    }))
                             .Sum(gr => gr.Item2);
 
-            var vs2 = fences.GroupBy(fence => fence.dir)
-                            .First(gr => gr.Key == (0, -1))
-                            .Select(fence => fence.point)
-                            .GroupBy(fence => fence.x)
-                            .Select(gr => gr.OrderBy(fence => fence.y))
-                            .Select(gr => gr.Aggregate((-2, 0), (res, point) => {
-                                if (res.Item1 + 1 < point.y)
-                                    return (point.y, res.Item2 + 1);
-                                else
-                                    return (point.y, res.Item2);
-                                }))
+                var hs2 = fences.GroupBy(fence => fence.dir)
+                                .First(gr => gr.Key == (-1, 0))
+                                .Select(fence => fence.point)
+                                .GroupBy(fence => fence.y)
+                                .Select(gr => gr.OrderBy(fence => fence.x))
+                                .Select(gr => gr.Aggregate((-2, 0), (res, point) => {
+                                    if (res.Item1 + 1 < point.x)
+                                        return (point.x, res.Item2 + 1);
+                                    else
+                                        return (point.x, res.Item2);
+                                    }))
                             .Sum(gr => gr.Item2);
 
-            yield return (area, hs1 + vs1 + hs2 + vs2);
+                var vs1 = fences.GroupBy(fence => fence.dir)
+                                .First(gr => gr.Key == (0, +1))
+                                .Select(fence => fence.point)
+                                .GroupBy(fence => fence.x)
+                                .Select(gr => gr.OrderBy(fence => fence.y))
+                                .Select(gr => gr.Aggregate((-2, 0), (res, point) => {
+                                    if (res.Item1 + 1 < point.y)
+                                        return (point.y, res.Item2 + 1);
+                                    else
+                                        return (point.y, res.Item2);
+                                    }))
+                                .Sum(gr => gr.Item2);
+
+                var vs2 = fences.GroupBy(fence => fence.dir)
+                                .First(gr => gr.Key == (0, -1))
+                                .Select(fence => fence.point)
+                                .GroupBy(fence => fence.x)
+                                .Select(gr => gr.OrderBy(fence => fence.y))
+                                .Select(gr => gr.Aggregate((-2, 0), (res, point) => {
+                                    if (res.Item1 + 1 < point.y)
+                                        return (point.y, res.Item2 + 1);
+                                    else
+                                        return (point.y, res.Item2);
+                                    }))
+                                .Sum(gr => gr.Item2);
+
+                yield return (area, hs1 + vs1 + hs2 + vs2);
+            }
         }
     }
 }
@@ -161,8 +169,8 @@ OXOXO
 OOOOO
 ";
 
-        // Assert.Equal(772, new Gardener().Solve(input));
-        Assert.Equal(436L, new Gardener().Solve(input));
+        Assert.Equal(772, new Gardener(Part.A).Solve(input));
+        Assert.Equal(436, new Gardener(Part.B).Solve(input));
     }
 
     [Fact]
@@ -177,7 +185,8 @@ ABBAAA
 AAAAAA
 ";
 
-        Assert.Equal(368L, new Gardener().Solve(input));
+        Assert.Equal(1184, new Gardener(Part.A).Solve(input));
+        Assert.Equal( 368, new Gardener(Part.B).Solve(input));
     }
 
     [Fact]
@@ -196,6 +205,7 @@ MIIISIJEEE
 MMMISSJEEE
 ";
 
-        Assert.Equal(1206L, new Gardener().Solve(input));
+        Assert.Equal(1930, new Gardener(Part.A).Solve(input));
+        Assert.Equal(1206, new Gardener(Part.B).Solve(input));
     }
 }
