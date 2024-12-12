@@ -4,8 +4,7 @@ namespace Year2024.Day08;
 [Solver(2024, 08, Part.B)]
 class Resonant : Solver
 {
-    public Resonant() {}
-    internal Resonant(Part part) { Part = part; }
+    internal Resonant(Part part) : base(part) {}
 
     internal override object Solve(string input) 
     {
@@ -88,7 +87,7 @@ public class ResonantTest
 ............
 ";
 
-        Assert.Equal(14, new Resonant().Solve(input));
+        Assert.Equal(14, new Resonant(Part.A).Solve(input));
     }
 
     [Fact]
@@ -107,7 +106,7 @@ public class ResonantTest
 ..........
 ";
 
-        Assert.Equal(4, new Resonant().Solve(input));
+        Assert.Equal(4, new Resonant(Part.A).Solve(input));
     }
 
     [Fact]

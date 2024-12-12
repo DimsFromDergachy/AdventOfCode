@@ -4,8 +4,7 @@ namespace Year2024.Day06;
 [Solver(2024, 06, Part.B)]
 class Guard : Solver
 {
-    public Guard() {}
-    internal Guard(Part part) { Part = part; }
+    internal Guard(Part part) : base(part) {}
 
     internal override object Solve(string input)
     {

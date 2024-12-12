@@ -6,8 +6,7 @@ namespace Year2015.Day10;
 [Solver(2015, 10, Part.B)]
 class LookAndSayGamer : Solver
 {
-    public LookAndSayGamer() {}
-    internal LookAndSayGamer(Part part) { Part = part; }
+    internal LookAndSayGamer(Part part) : base(part) {}
 
     int Count
     {
@@ -41,14 +40,14 @@ public class LookAndSayGamerTest
     [InlineData("111221", "312211")]
     internal void Step(string input, string expected)
     {
-        Assert.Equal(expected, new LookAndSayGamer().Step(input));
+        Assert.Equal(expected, new LookAndSayGamer(Part.A).Step(input));
     }
 
-    [Theory]
-    [InlineData(Part.A, "3113322113", 329356)]
-    [InlineData(Part.B, "3113322113", 4666278)]
-    internal void Example(Part part, string input, int expected)
+    [Fact]
+    internal void Example()
     {
-        Assert.Equal(expected, new LookAndSayGamer(part).Solve(input));
+        var input = "3113322113";
+        Assert.Equal(329356, new LookAndSayGamer(Part.A).Solve(input));
+        Assert.Equal(4666278, new LookAndSayGamer(Part.B).Solve(input));
     }
 }

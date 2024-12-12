@@ -4,8 +4,7 @@ namespace Year2024.Day10;
 [Solver(2024, 10, Part.B)]
 class Hiker : Solver
 {
-    public Hiker() {}
-    internal Hiker(Part part) { Part = part; }
+    public Hiker(Part part) : base(part) {}
 
     List<(int dx, int dy)> dirs = new List<(int dx, int dy)>
         { (0, 1), (1, 0), (0, -1), (-1, 0) };

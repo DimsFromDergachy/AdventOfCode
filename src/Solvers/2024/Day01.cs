@@ -4,8 +4,7 @@ namespace Year2024.Day01;
 [Solver(2024, 01, Part.B)]
 class Historian : Solver
 {
-    public Historian() {}
-    internal Historian(Part part) { Part = part; }
+    internal Historian(Part part) : base(part) {}
 
     internal override object Solve(string input)
     {

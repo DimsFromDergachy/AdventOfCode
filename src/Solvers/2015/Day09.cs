@@ -6,8 +6,7 @@ namespace Year2015.Day09;
 [Solver(2015, 09, Part.B)]
 class SalesSanta : Solver
 {
-    public SalesSanta() {}
-    internal SalesSanta(Part part) { Part = part; }
+    internal SalesSanta(Part part) : base(part) {}
 
     Regex regex = new Regex("(\\w+) to (\\w+) = (\\d+)");
 

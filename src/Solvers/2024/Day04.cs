@@ -4,8 +4,7 @@ namespace Year2024.Day04;
 [Solver(2024, 04, Part.B)]
 class XMAS : Solver
 {
-    public XMAS() { }
-    internal XMAS(Part part) { Part = part; }
+    internal XMAS(Part part) : base(part) {}
 
     List<(char ch, int dx, int dy)> maskA = new List<(char, int, int)>
     {
@@ -58,7 +57,7 @@ public class XmasTest
     [Fact]
     public void Simple()
     {
-        Assert.Equal(1, new XMAS().Solve("XMAS"));
+        Assert.Equal(1, new XMAS(Part.A).Solve("XMAS"));
 
         var input = @"
 M.S
@@ -96,8 +95,8 @@ S.S.S.S.SS
 ..M.M.M.MM
 .X.X.XMASX";
 
-        Assert.Equal(18, new XMAS().Solve(input1));
-        Assert.Equal(18, new XMAS().Solve(input2));
+        Assert.Equal(18, new XMAS(Part.A).Solve(input1));
+        Assert.Equal(18, new XMAS(Part.A).Solve(input2));
     }
 
     [Fact]

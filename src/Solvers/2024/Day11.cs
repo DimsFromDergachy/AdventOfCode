@@ -6,11 +6,9 @@ class Blinker : Solver
 {
     int Blink = 75;
 
-    public Blinker() {}
     internal Blinker(int blink) { Blink = blink; }
-    internal Blinker(Part part)
+    internal Blinker(Part part) : base(part)
     {
-        Part = part;
         #pragma warning disable CS8524
         Blink = part switch {
             Part.A => 25,

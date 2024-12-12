@@ -4,8 +4,7 @@ namespace Year2024.Day07;
 [Solver(2024, 07, Part.B)]
 class Repairer : Solver
 {
-    public Repairer() {}
-    internal Repairer(Part part) { Part = part; }
+    internal Repairer(Part part) : base(part) {}
 
     internal override object Solve(string input) =>
         input.Lines()

@@ -4,8 +4,7 @@ namespace Year2024.Day05;
 [Solver(2024, 05, Part.B)]
 class PrintHelper : Solver
 {
-    public PrintHelper() {}
-    internal PrintHelper(Part part) { Part = part; }
+    internal PrintHelper(Part part) : base(part) {}
 
     internal override object Solve(string input)
     {

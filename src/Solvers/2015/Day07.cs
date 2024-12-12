@@ -154,14 +154,14 @@ public class Test
     public void Simple()
     {
         var input = "42 -> a";
-        Assert.Equal((ushort) 42, (new SolverA("a")).Solve(input));
+        Assert.Equal((ushort) 42, new SolverA("a").Solve(input));
     }
 
     [Fact]
     public void Not()
     {
         var input = "0 -> b\nNOT b -> a";
-        Assert.Equal(ushort.MaxValue, (new SolverA("a")).Solve(input));
+        Assert.Equal(ushort.MaxValue, new SolverA("a").Solve(input));
     }
 
     [Fact]

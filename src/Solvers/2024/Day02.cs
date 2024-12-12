@@ -4,8 +4,7 @@ namespace Year2024.Day02;
 [Solver(2024, 02, Part.B)]
 class RedNosedChecker : Solver
 {
-    public RedNosedChecker() {}
-    internal RedNosedChecker(Part part) { Part = part; }
+    internal RedNosedChecker(Part part) : base(part) {}
 
     internal override object Solve(string input) =>
         input.Lines()

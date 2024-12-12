@@ -4,8 +4,7 @@ namespace Year2024.Day09;
 [Solver(2024, 09, Part.B)]
 class Defragmenter : Solver
 {
-    public Defragmenter() {}
-    internal Defragmenter(Part part) { Part = part; }
+    internal Defragmenter(Part part) : base(part) {}
 
     internal override object Solve(string input) =>
         input.Chunk(2)
