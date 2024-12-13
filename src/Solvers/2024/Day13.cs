@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 namespace Year2024.Day13;
 
 [Solver(2024, 13, Part.A)]
+[Solver(2024, 13, Part.B)]
 class Winner : Solver
 {
     Regex A = new Regex(@"Button A: X\+(\d+), Y\+(\d+)");
@@ -37,8 +38,12 @@ class Winner : Solver
 
     IEnumerable<(long A, long B)> Solve(long[] pz)
     {
-        pz[4] += 10000000000000;
-        pz[5] += 10000000000000;
+        if (Part == Part.B)
+        {
+            pz[4] += 10000000000000;
+            pz[5] += 10000000000000;
+        }
+
         long A, B;
         if ((pz[0] * pz[3] - pz[1] * pz[2]) == 0)
         {
@@ -72,30 +77,7 @@ class Winner : Solver
 public class WinnerTest
 {
     [Fact]
-    internal void ExampleB()
-    {
-        var input = @"
-Button A: X+94, Y+34
-Button B: X+22, Y+67
-Prize: X=10000000008400, Y=10000000005400
-
-Button A: X+26, Y+66
-Button B: X+67, Y+21
-Prize: X=10000000012748, Y=10000000012176
-
-Button A: X+17, Y+86
-Button B: X+84, Y+37
-Prize: X=10000000007870, Y=10000000006450
-
-Button A: X+69, Y+23
-Button B: X+27, Y+71
-Prize: X=10000000018641, Y=10000000010279
-";
-        //Assert.Equal(480L, new Winner(Part.B).Solve(input));
-    }
-
-    [Fact]
-    internal void ExampleA()
+    internal void Example()
     {
         var input = @"
 Button A: X+94, Y+34
@@ -114,7 +96,8 @@ Button A: X+69, Y+23
 Button B: X+27, Y+71
 Prize: X=18641, Y=10279
 ";
-        Assert.Equal(480L, new Winner(Part.A).Solve(input));
+        Assert.Equal(         480L, new Winner(Part.A).Solve(input));
+        Assert.Equal(875318608908L, new Winner(Part.B).Solve(input));
     }
 
     [Fact]
@@ -148,6 +131,12 @@ Prize: X=2, Y=4";
 Button A: X+1, Y+2
 Button B: X+2, Y+4
 Prize: X=15, Y=30";
-        Assert.Equal(3L + 7L, new Winner(Part.A).Solve(input));
+        Assert.Equal(10L, new Winner(Part.A).Solve(input));
+
+        input = @"
+Button A: X+4, Y+4
+Button B: X+1, Y+1
+Prize: X=15, Y=15";
+        Assert.Equal(12L, new Winner(Part.A).Solve(input));
     }
 }
