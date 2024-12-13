@@ -158,4 +158,10 @@ public class EnumerableExtensionsTest
             p3 => Assert.Equal(   [1], p3)
         );
     }
+
+    [Fact]
+    public void Cycle()
+    {
+        Assert.Throws<ArgumentException>(() => Enumerable.Empty<int>().Cycle().ToList());
+    }
 }
