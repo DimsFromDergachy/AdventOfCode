@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 namespace Year2015.Day06;
 
 [Solver(2015, 06, Part.A)]
-class LightController : Solver
+class LightControllerA : Solver
 {
     private const int Size = 1000;
     private readonly Regex regex
@@ -43,7 +43,7 @@ class LightController : Solver
 }
 
 [Solver(2015, 06, Part.B)]
-class LightController2 : Solver
+class LightControllerB : Solver
 {
     private const int Size = 1000;
     private readonly Regex regex
@@ -79,5 +79,31 @@ class LightController2 : Solver
             }
 
         return lights;
+    }
+}
+
+public class LightControllerTest
+{
+    [Fact]
+    internal void ExampleA()
+    {
+        var input = @"
+turn on 0,0 through 999,999
+toggle 0,0 through 999,0
+turn off 499,499 through 500,500
+";
+
+        Assert.Equal(1000 * 1000 - 1000 - 4, new LightControllerA().Solve(input));
+    }
+
+    [Fact]
+    internal void ExampleB()
+    {
+        var input = @"
+turn on 0,0 through 0,0
+toggle 0,0 through 999,999
+";
+
+        Assert.Equal(1 + 2000000, new LightControllerB().Solve(input));
     }
 }
