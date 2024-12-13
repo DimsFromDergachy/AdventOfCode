@@ -1,5 +1,0 @@
-enum Part
-{
-    A,
-    B,
-}

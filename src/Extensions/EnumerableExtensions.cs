@@ -61,7 +61,8 @@ static class EnumerableExtensions
         }
     }
 
-    // Group [1,1,2,1] => [[1,1], [2], [1]]
+    // Group   [1,1,2,1] => [[1,1], [2], [1]]
+    // GroupBy [1,1,2,1] => [[1,1,1], [2]]
     public static IEnumerable<List<TSource>> Group<TSource>(this IEnumerable<TSource> source)
     {
         var list = new List<TSource>();
