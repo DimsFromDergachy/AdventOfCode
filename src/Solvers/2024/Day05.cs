@@ -108,7 +108,7 @@ public class PrintHelperTest
     [Fact]
     internal void Input()
     {
-        var input = File.ReadAllText("./Solvers/2024/Input/Day05");
+        var input = File.ReadAllText("./Solvers/2024/Data/Day05");
 
         Assert.Equal(7074, new PrintHelper(Part.A).Solve(input));
         Assert.Equal(4828, new PrintHelper(Part.B).Solve(input));
