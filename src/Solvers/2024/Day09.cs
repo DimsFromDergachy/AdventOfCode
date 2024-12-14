@@ -111,7 +111,7 @@ static class Extensions
     }
 }
 
-public class ATest
+public class DefragmenterTest
 {
     [Fact]
     internal void Example()

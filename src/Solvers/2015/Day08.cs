@@ -18,9 +18,8 @@ class SolverB : Solver
              .Sum();
 }
 
-internal static class StringExtensions
+static class StringExtensions
 {
-    #pragma warning disable CS8509
     internal static IEnumerable<char> Unescape(this string source)
     {
         var context = string.Empty;
