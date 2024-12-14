@@ -6,5 +6,4 @@ var solver = Services.GetSolver(year, day, part);
 
 Console.Beep();
 
-Console.Out.WriteLine();
 Console.Out.WriteLine(solver.Solve(Console.In.ReadToEnd()));
