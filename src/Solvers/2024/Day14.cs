@@ -32,8 +32,8 @@ class A : Solver
         var q3 = robots.Count(r => r.x < 0 && r.y > 0);
         var q4 = robots.Count(r => r.x > 0 && r.y < 0);
 
-        return (long)q1 * (long)q2 * (long)q3 * (long)q4;
-        //return (q1, q2, q3, q4);
+        //return (long)q1 * (long)q2 * (long)q3 * (long)q4;
+        return (q1, q2, q3, q4);
     }
 
     Robot Shift(Robot robot, int time)
@@ -90,5 +90,7 @@ p=9,5 v=-3,-3
 ";
 
         Assert.Equal(12, new A(Part.A, (11, 7)).Solve(input));
+
+        // (120, 121, 115, 121)
     }
 }
