@@ -84,17 +84,17 @@ class Boxer : Solver
             return _;
 
         var boxes = new  List<(int x, int y)>();
-        var stack = new Stack<(int x, int y)>();
+        var queue = new Queue<(int x, int y)>();
 
         if (_.map[moveTo.x, moveTo.y] == '[')
-            stack.Push(moveTo);
+            queue.Enqueue(moveTo);
 
         if (_.map[moveTo.x, moveTo.y] == ']')
-            stack.Push((moveTo.x - 1, moveTo.y));
+            queue.Enqueue((moveTo.x - 1, moveTo.y));
 
-        while (stack.Any())
+        while (queue.Any())
         {
-            var box = stack.Pop();
+            var box = queue.Dequeue();
             boxes.Insert(0, box);
             var  leftMoveTo = (x: 0 + box.x + this[move].dx, y: box.y + this[move].dy);
             var rightMoveTo = (x: 1 + box.x + this[move].dx, y: box.y + this[move].dy);
@@ -106,22 +106,16 @@ class Boxer : Solver
                 return _;
 
             if (_.map[leftMoveTo.x, leftMoveTo.y] == '[')
-                stack.Push(leftMoveTo);
+                queue.Enqueue(leftMoveTo);
 
             if (_.map[leftMoveTo.x, leftMoveTo.y] == ']' && move != '>')
-                stack.Push((leftMoveTo.x - 1, leftMoveTo.y));
+                queue.Enqueue((leftMoveTo.x - 1, leftMoveTo.y));
 
             if (_.map[rightMoveTo.x, rightMoveTo.y] == '[' && move != '<')
-                stack.Push(rightMoveTo);
+                queue.Enqueue(rightMoveTo);
 
             if (_.map[rightMoveTo.x, rightMoveTo.y] == ']')
-                stack.Push((rightMoveTo.x - 1, rightMoveTo.y));
-        }
-
-        switch (move)
-        {
-            case '^': { boxes = boxes.OrderBy(box => box.y).ToList(); break; }
-            case 'v': { boxes = boxes.OrderBy(box => box.y).Reverse().ToList(); break; }
+                queue.Enqueue((rightMoveTo.x - 1, rightMoveTo.y));
         }
 
         foreach (var box in boxes)
