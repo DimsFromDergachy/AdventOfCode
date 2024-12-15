@@ -3,6 +3,8 @@ namespace Year2024.Day15;
 [Solver(2024, 15, Part.A)]
 class Boxer : Solver
 {
+    internal Boxer(Part part) : base(part) {}
+
     internal override object Solve(string input)
     {
         var lines = input.Lines(StringSplitOptions.None)
@@ -26,16 +28,16 @@ class Boxer : Solver
                     // .ToArray();
                     .Where(pair => pair.Value == 'O')
                     .Select(pair => pair.Index)
-                    .Sum(index => 100 * index.i + index.j);
+                    .Sum(index => 100 * index.x + index.y);
     }
 
     #pragma warning disable CS8509
     (int dx, int dy) this[char ch] => ch switch
     {
-        '>' => ( 0, +1),
-        '^' => (-1,  0),
-        '<' => ( 0, -1),
-        'v' => (+1,  0),
+        '>' => (+1,  0),
+        '^' => ( 0, -1),
+        '<' => (-1,  0),
+        'v' => ( 0, +1),
     };
 
     ((int x, int y), char[,]) Move(((int x, int y) robot, char[,] map) _, char move)
@@ -75,10 +77,10 @@ public class Test()
 <^^>>>vv<v>>v<<
 ";
 
-        Assert.Equal(2028, new Boxer().Solve(input));
+        Assert.Equal(2028, new Boxer(Part.A).Solve(input));
     }
 
-    // [Fact]
+    [Fact]
     internal void BigExample()
     {
         var input = @"
@@ -105,6 +107,6 @@ vvv<<^>^v^^><<>>><>^<<><^vv^^<>vvv<>><^^v>^>vv<>v<<<<v<^v>^<^^>>>^<v<v
 v^^>>><<^^<>>^v^<v^vv<>v^<<>^<^v^v><^<<<><<^<v><v<>vv>>v><v^<vv<>v^<<^
 ";
 
-        Assert.Equal(10092, new Boxer().Solve(input));
+        Assert.Equal(10092, new Boxer(Part.A).Solve(input));
     }
 }

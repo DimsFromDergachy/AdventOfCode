@@ -23,7 +23,7 @@ class Gardener : Solver
 
         foreach (var start in map.ToEnumerable())
         {
-            if (visited[start.Index.i, start.Index.j])
+            if (visited[start.Index.x, start.Index.y])
                 continue;
 
             var plant = start.Value;
