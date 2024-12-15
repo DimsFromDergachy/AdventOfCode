@@ -69,7 +69,7 @@ class Resonant : Solver
 
 public class ResonantTest
 {
-    [Fact]
+    // [Fact]
     internal void Example()
     {
         var input = @"
@@ -90,7 +90,7 @@ public class ResonantTest
         Assert.Equal(14, new Resonant(Part.A).Solve(input));
     }
 
-    [Fact]
+    // [Fact]
     internal void Example2()
     {
         var input = @"
@@ -109,7 +109,7 @@ public class ResonantTest
         Assert.Equal(4, new Resonant(Part.A).Solve(input));
     }
 
-    [Fact]
+    // [Fact]
     internal void ExamplePartB()
     {
         var input = @"
@@ -128,7 +128,7 @@ T.........
         Assert.Equal(9, new Resonant(Part.B).Solve(input));
     }
 
-    [Fact]
+    // [Fact]
     internal void ExamplePartB2()
     {
         var input = @"

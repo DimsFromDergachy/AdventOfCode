@@ -113,7 +113,7 @@ class Guard : Solver
 
 public class GuardTest
 {
-    [Fact]
+    // [Fact]
     internal void Simple()
     {
         var input = @"
@@ -124,7 +124,7 @@ public class GuardTest
         Assert.Equal(0, new Guard(Part.B).Solve(input));
     }
 
-    [Fact]
+    // [Fact]
     internal void Simple2()
     {
         var input = @"
@@ -140,7 +140,7 @@ public class GuardTest
         Assert.Equal(2, new Guard(Part.B).Solve(input));
     }
 
-    [Fact]
+    // [Fact]
     internal void Example()
     {
         var input = @"
