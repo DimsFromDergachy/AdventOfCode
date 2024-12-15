@@ -30,7 +30,7 @@ class Guard : Solver
         yield return start;
 
         var dirs = new List<(int dx, int dy)>
-            {(-1, 0), (0, 1), (1, 0), (0, -1)}.Cycle();
+            {(0, -1), (1, 0), (0, 1), (-1, 0)}.Cycle();
 
         while (true)
         {
@@ -66,7 +66,7 @@ class Guard : Solver
         List<(int x, int y)> path = new List<(int, int)> { start };
 
         var dirs = new List<(int dx, int dy)>
-            {(-1, 0), (0, 1), (1, 0), (0, -1)}.Cycle();
+            {(0, -1), (1, 0), (0, 1), (-1, 0)}.Cycle();
 
         (int x, int y)? obstacle = null;
 
@@ -85,7 +85,7 @@ class Guard : Solver
 
                 if (path.Contains(start)
                     ||
-                    start.y == start_.y && start.x >= start_.x)
+                    start.x == start_.x && start.y >= start_.y)
                 {
                     map[next.Item1, next.Item2] = '#';
                     if (CheckLoop(map, start_))
@@ -113,7 +113,7 @@ class Guard : Solver
 
 public class GuardTest
 {
-    // [Fact]
+    [Fact]
     internal void Simple()
     {
         var input = @"
@@ -124,7 +124,7 @@ public class GuardTest
         Assert.Equal(0, new Guard(Part.B).Solve(input));
     }
 
-    // [Fact]
+    [Fact]
     internal void Simple2()
     {
         var input = @"
@@ -140,7 +140,7 @@ public class GuardTest
         Assert.Equal(2, new Guard(Part.B).Solve(input));
     }
 
-    // [Fact]
+    [Fact]
     internal void Example()
     {
         var input = @"

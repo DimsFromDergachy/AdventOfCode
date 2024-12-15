@@ -35,7 +35,7 @@ static class ArrayExtensions
 
 public class ArrayExtensionsTest
 {
-    // [Fact]
+    [Fact]
     public void ToArray()
     {
         var input = @"
@@ -55,10 +55,16 @@ EFGH";
         Assert.Equal('H', array[3, 1]);
     }
 
-    // [Fact]
+    [Fact]
     public void ToEnumerable()
     {
-        var array = new int[2,3] {{1,2,3}, {4,5,6}};
+        var input = @"
+1 2 3
+4 5 6";
+
+        var array = input.Lines()
+                         .Select(line => line.Parse<int>())
+                         .ToArray();
         Assert.Equal([((0, 0), 1), ((1, 0), 2), ((2, 0), 3),
                       ((0, 1), 4), ((1, 1), 5), ((2, 1), 6)],
             array.ToEnumerable());

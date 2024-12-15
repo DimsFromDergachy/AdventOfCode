@@ -68,7 +68,7 @@ class PrintHelper : Solver
 
 public class PrintHelperTest
 {
-    // [Fact]
+    [Fact]
     internal void Example()
     {
         var input =
@@ -105,7 +105,7 @@ public class PrintHelperTest
         Assert.Equal(123, new PrintHelper(Part.B).Solve(input));
     }
 
-    // [Fact]
+    [Fact]
     internal void Input()
     {
         var input = File.ReadAllText("./Solvers/2024/Data/Day05");
