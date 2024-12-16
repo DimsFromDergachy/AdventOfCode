@@ -11,10 +11,10 @@ class Mazer : Solver
         var maze = input.Lines()
                         .ToArray();
 
-        return SolverA(maze);
+        return Solve(maze);
     }
 
-    int SolverA(char[,] maze)
+    int Solve(char[,] maze)
     {
         var S = maze.ToEnumerable()
                     .Single(pair => pair.Value == 'S')
@@ -69,8 +69,8 @@ class Mazer : Solver
         }
 
         var E = maze.ToEnumerable()
-            .Single(pair => pair.Value == 'E')
-            .Index;
+                    .Single(pair => pair.Value == 'E')
+                    .Index;
 
         var min = Enumerable.Range(0, 4)
                             .Select(z => dyno[z, E.x, E.y])
