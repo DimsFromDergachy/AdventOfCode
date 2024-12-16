@@ -24,6 +24,14 @@ static class ArrayExtensions
             yield return (x, y);
     }
 
+    internal static IEnumerable<(int x, int y, int z)> GetIndexes<T>(this T[,,] array)
+    {
+        for (int z = array.GetLowerBound(0); z <= array.GetUpperBound(0); z++)
+        for (int y = array.GetLowerBound(2); y <= array.GetUpperBound(2); y++)
+        for (int x = array.GetLowerBound(1); x <= array.GetUpperBound(1); x++)
+            yield return (x, y, z);
+    }
+
     internal static IEnumerable<T> GetValues<T>(this T[,] array)
     {
         foreach (var index in array.GetIndexes())
