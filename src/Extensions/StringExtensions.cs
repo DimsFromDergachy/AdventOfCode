@@ -5,10 +5,10 @@ static class StringExtensions
             StringSplitOptions options = StringSplitOptions.RemoveEmptyEntries) =>
         source.Split(['\r', '\n'], options);
 
-    internal static string[] Words(this string source, char separator = ' ') =>
-        source.Split(separator, StringSplitOptions.RemoveEmptyEntries);
+    internal static string[] Words(this IEnumerable<char> source, char separator = ' ') =>
+        new string(source.ToArray()).Split(separator, StringSplitOptions.RemoveEmptyEntries);
 
-    internal static IEnumerable<T> Parse<T>(this string line, char separator = ' ') =>
+    internal static IEnumerable<T> Parse<T>(this IEnumerable<char> line, char separator = ' ') =>
         typeof(T).Name switch
         {
             nameof(Int32) => line.Words(separator).Select( int.Parse).OfType<T>(),
