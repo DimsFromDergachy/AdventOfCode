@@ -19,88 +19,32 @@ class Computer : Solver
         };
 
         var program = lines.Last()
-                           .Skip(9)
+                           .Skip("Program: ".Count())
                            .Parse<int>(',')
                            .ToArray();
 
         if (Part == Part.A)
             return string.Join(",", Execute(state, program).Select(p => p.output));
 
-        int maxP = 0;
-
-        // for (long x = 4373700205; x < long.MaxValue; x++)
-        // for (long x = 1243744394861L; x < long.MaxValue; x++)
-        for (long x = 1; x < long.MaxValue; x++)
+        long A = 0; // this is the program halt condition
+        for (int p = program.Count() - 1; p >= 0; p--)
         {
-            state.A = x;
-            int p = 0;
-            bool good = true;
-
-            var iteratorA = new StateEnumerator(state, program);
-            // var iteratorB = new StateEnumerator(state, program);
-
-            // do
+            long B = p > 0 ? program[p] : 0; // the previous step has been printed from B register
+            var tail = program.Skip(p);
+            for (A = A * 8; true; A++)
             {
-                iteratorA.MoveNext();
-                iteratorA.MoveNext();
-                iteratorA.MoveNext();
-                iteratorA.MoveNext();
-                iteratorA.MoveNext();
-                iteratorA.MoveNext();
-                iteratorA.MoveNext();
+                state.A = A;
+                state.B = B;
 
-                if (iteratorA.Current.output != null)
+                var output = Execute(state, program).Select(p => p.output);
+                if (output.Zip(tail).All(p => p.First == p.Second))
                 {
-                    if (p >= program.Count() || iteratorA.Current.output.Value != program[p++])
-                    {
-                        good = false;
-                        break;
-                    }
+                    break;
                 }
-
-                iteratorA.MoveNext();
-
-                if (iteratorA.Current.A == 1)
-                {
-                    return x;
-                }
-
-                // if (iteratorA.MoveNext() == false)
-                // {
-                //     break;
-                // }
-
-                // if (iteratorB.MoveNext() && iteratorB.MoveNext())
-                // {
-                //     // Infinity loop check
-                //     if (iteratorA.Current.Equals(iteratorB.Current))
-                //     {
-                //         Console.Out.WriteLine($"Infinity loop detected with {x}");
-                //         good = false;
-                //         break;
-                //     }
-                // }
-
-            }
-            // while (true);
-
-            if (good && p == program.Count())
-            {
-                Console.WriteLine(" BINGO ");
-                return x;
-            }
-
-            // if (x % 10000000 == 0)
-            //     Console.WriteLine(x);
-
-            if (p > maxP)
-            {
-                maxP = p;
-                Console.WriteLine($"{p:D2} - {x:D20} - {Convert.ToString(x,2).PadLeft(64,'0')}");
             }
         }
 
-        throw new NotImplementedException();
+        return A;
     }
 
     IEnumerable<(State state, long output)> Execute(State state, int[] program)
@@ -130,7 +74,7 @@ class Computer : Solver
         };
         internal long? output;
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj == null || GetType() != obj.GetType())
             {
@@ -145,10 +89,7 @@ class Computer : Solver
                 && Pointer == that.Pointer;
         }
 
-        public override int GetHashCode()
-        {
-            return (int) (A ^ B ^ C ^ Pointer);
-        }
+        public override int GetHashCode() => throw new NotImplementedException();
     }
 
     class StateEnumerator : IEnumerator<State>
@@ -258,6 +199,7 @@ Program: 0,3,5,4,3,0
 ";
 
         Assert.Equal("0,3,5,4,3,0", new Computer(Part.A).Solve(input));
+        Assert.Equal(117440L, new Computer(Part.B).Solve(input));
     }
 
     [Fact]
@@ -272,5 +214,6 @@ Program: 2,4,1,3,7,5,0,3,1,5,4,4,5,5,3,0
 ";
 
         Assert.Equal("2,4,1,3,7,5,0,3,1,5,4,4,5,5,3,0", new Computer(Part.A).Solve(input));
+        Assert.Equal(236539226447469L, new Computer(Part.B).Solve(input));
     }
 }
