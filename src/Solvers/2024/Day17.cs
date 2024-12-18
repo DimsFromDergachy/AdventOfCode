@@ -250,14 +250,14 @@ Program: 0,1,5,4,3,0
     internal void ExampleB()
     {
         var input = @"
-Register A: 2024
+Register A: 117440
 Register B: 0
 Register C: 0
 
 Program: 0,3,5,4,3,0
 ";
 
-        Assert.Equal(117440L, new Computer(Part.B).Solve(input));
+        Assert.Equal("0,3,5,4,3,0", new Computer(Part.A).Solve(input));
     }
 
     [Fact]
