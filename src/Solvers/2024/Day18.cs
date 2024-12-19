@@ -1,5 +1,3 @@
-using System.Drawing;
-
 namespace Year2024.Day18;
 
 [Solver(2024, 18, Part.A)]
@@ -44,7 +42,7 @@ class RamRunner : Solver
             var middle = (left + right) / 2;
 
             var map = inputs.Take(middle)
-                        .Aggregate(new bool[Size.X + 1, Size.Y + 1],
+                            .Aggregate(new bool[Size.X + 1, Size.Y + 1],
                                    (map, pair) =>
                                    {
                                         map[pair.x, pair.y] = true;
@@ -52,16 +50,12 @@ class RamRunner : Solver
                                    });
 
             if (BFS(map, (0, 0), Size) == -1)
-            {
                 right = middle;
-            }
             else
-            {
                 left = middle;
-            }
         }
 
-        return inputs[right - 1];
+        return inputs[left];
     }
 
     int BFS(bool[,] map, (int x, int y) start, (int x, int y) finish)
@@ -135,7 +129,7 @@ public class RamRunnerTest
 2,0
 ";
 
-        Assert.Equal(22, new RamRunner(Part.A, (6, 6), 12).Solve(input));
+        Assert.Equal(   22,  new RamRunner(Part.A, (6, 6), 12).Solve(input));
         Assert.Equal((6, 1), new RamRunner(Part.B, (6, 6), 12).Solve(input));
     }
 }

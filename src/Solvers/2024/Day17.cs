@@ -73,23 +73,6 @@ class Computer : Solver
             _ => operand,
         };
         internal long? output;
-
-        public override bool Equals(object? obj)
-        {
-            if (obj == null || GetType() != obj.GetType())
-            {
-                return false;
-            }
-
-            var that = (State) obj;
-
-            return A == that.A
-                && B == that.B
-                && C == that.C
-                && Pointer == that.Pointer;
-        }
-
-        public override int GetHashCode() => throw new NotImplementedException();
     }
 
     class StateEnumerator : IEnumerator<State>

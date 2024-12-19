@@ -5,14 +5,14 @@ static class StringExtensions
             StringSplitOptions options = StringSplitOptions.RemoveEmptyEntries) =>
         source.Split(['\r', '\n'], options);
 
-    internal static string[] Words(this IEnumerable<char> source, char separator = ' ') =>
-        new string(source.ToArray()).Split(separator, StringSplitOptions.RemoveEmptyEntries);
+    internal static string[] Words(this IEnumerable<char> source, params char[] separators) =>
+        new string(source.ToArray()).Split(separators, StringSplitOptions.RemoveEmptyEntries);
 
-    internal static IEnumerable<T> Parse<T>(this IEnumerable<char> line, char separator = ' ') =>
+    internal static IEnumerable<T> Parse<T>(this IEnumerable<char> line, params char[] separators) =>
         typeof(T).Name switch
         {
-            nameof(Int32) => line.Words(separator).Select( int.Parse).OfType<T>(),
-            nameof(Int64) => line.Words(separator).Select(long.Parse).OfType<T>(),
+            nameof(Int32) => line.Words(separators).Select( int.Parse).OfType<T>(),
+            nameof(Int64) => line.Words(separators).Select(long.Parse).OfType<T>(),
             _ => throw new NotImplementedException(nameof(Int32)),
         };
 }
