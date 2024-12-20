@@ -1,10 +1,11 @@
 static class ArrayExtensions
 {
-    internal static T[,] ToArray<T>(this IEnumerable<IEnumerable<T>> source)
+    // internal static TElem[,] ToArray<TRank, TElem>(this IEnumerable<IEnumerable<TElem>> source)
+    internal static TElem[,] ToArray<TElem>(this IEnumerable<IEnumerable<TElem>> source)
     {
         var n = source.First().Count();
         var m = source.Count();
-        var array = new T[n, m];
+        var array = new TElem[n, m];
 
         foreach (var (xs, y) in source.Zip(Enumerable.Range(0, m)))
             foreach (var (elem, x) in xs.Zip(Enumerable.Range(0, n)))
@@ -41,6 +42,8 @@ static class ArrayExtensions
     }
 }
 
+internal class _2D {}
+
 public class ArrayExtensionsTest
 {
     [Fact]
@@ -50,7 +53,8 @@ public class ArrayExtensionsTest
 ABCD
 EFGH";
 
-        var array = input.Lines().ToArray();
+        // var array = input.Lines().ToArray<_2D, char>();
+        var array = input.Lines().ToArray<char>();
         Assert.Equal(4, array.GetLength(0));
         Assert.Equal(2, array.GetLength(1));
         Assert.Equal('A', array[0, 0]);
