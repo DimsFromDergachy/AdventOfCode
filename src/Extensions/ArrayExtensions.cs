@@ -14,6 +14,19 @@ static class ArrayExtensions
         return array;
     }
 
+    internal static T[,] Print<T>(this T[,] array)
+    {
+        for (int j = 0; j < array.GetLength(1); j++)
+        {
+            for (int i = 0; i < array.GetLength(0); i++)
+                Console.Write(string.Format("{0,5}", array[i, j]));
+            Console.WriteLine();
+        }
+
+        return array;
+    }
+
+
     internal static IEnumerable<((int x, int y) Index, T Value)> ToEnumerable<T>(this T[,] array) =>
         array.GetIndexes()
              .Select(index => (index, array[index.x, index.y]));
