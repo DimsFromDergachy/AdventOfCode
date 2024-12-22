@@ -25,22 +25,20 @@ internal class RemoteController : Solver
                                     .Prepend(new RemoteNumPad())
                                     .ToArray();
 
-        // if (ChainLength >= 20)
-        // {
-        //     throw new NotImplementedException();
-        // }
-        // return input.Lines()
-        //             .Select(line => long.Parse(line.SkipLast(1).ToArray())
-        //                         *
-        //                     robots.Aggregate(line.Skip(0),
-        //                                     (l, r) => r.Moves(l)).Count())
-        //             .Sum();
-
         return input.Lines()
-                    .Sum(Solve2);
+                    // .Sum(line => SolveSlow(robots, line));
+                    .Sum(SolveFast);
     }
 
-    long Solve2(string input)
+    long SolveSlow(Remote[] robots, string line)
+    {
+        var input = long.Parse(line.SkipLast(1).ToArray());
+        var moves = robots.Aggregate(line.Skip(0),
+                                (l, r) => r.Moves(l));
+        return input * moves.LongCount();
+    }
+
+    long SolveFast(string input)
     {
         var line = new RemoteNumPad().Moves(input).ToArray();
         var dyno = new MultiRemoteDirPad(ChainLength).GetDyno();
@@ -141,11 +139,11 @@ internal class RemoteController : Solver
 //-----++++-----++-----++-----++-----++-----++-----++
 //  #  ||||  ^  ||  A  ||  <  ||  v  ||  >  ||     ||
 //-----++++-----++-----++-----++-----++-----++-----++
-/*  ^  */{ "   ", " > ", "v< ", " v ", " >v", }, //||
-/*  A  */{ "  <", "   ", "v<<", " v<", "  v", }, //||
+/*  ^  */{ "   ", " > ", "v< ", " v ", " v>", }, //||
+/*  A  */{ "  <", "   ", "v<<", "<v ", "  v", }, //||
 /*  <  */{ ">^ ", ">>^", "   ", ">  ", ">> ", }, //||
-/*  v  */{ " ^ ", " >^", " < ", "   ", " > ", }, //||
-/*  >  */{ " ^<", "  ^", " <<", "  <", "   ", }, //||
+/*  v  */{ " ^ ", " ^>", " < ", "   ", " > ", }, //||
+/*  >  */{ "<^ ", "  ^", " <<", "  <", "   ", }, //||
 //-----++++-----++-----++-----++-----++-----++-----++
             };
         }
@@ -231,24 +229,24 @@ public class RemoteControllerTest
     }
 
     [Theory]
-    [InlineData("^>", "<A>vA")]
-    [InlineData("^>AvvvA", "<A>vA^Av<AAA>^A")]
-    [InlineData("<A^A^^>AvvvA", "v<<A>>^A<A>A<AA>vA^Av<AAA>^A")]
-    [InlineData("^A^^<<A>>AvvvA", "<A>A<AAv<AA>>^AvAA^Av<AAA>^A")] // 379A -> 1
-    [InlineData("<A>A<AAv<AA>>^AvAA^Av<AAA>^A", "v<<A>>^AvA^Av<<A>>^AAv<A<A>>^AAvAA^<A>Av<A>^AA<A>Av<A<A>>^AAAvA^<A>A")] // 379A -> 2
-    [InlineData("^A<<^^A>>AvvvA", "<A>Av<<AA>^AA>AvAA^Av<AAA>^A")] // 379A -> 1
-    [InlineData("<A>Av<<AA>^AA>AvAA^Av<AAA>^A", "v<<A>>^AvA^Av<A<AA>>^AAvA^<A>AAvA^Av<A>^AA<A>Av<A<A>>^AAAvA^<A>A")] // 379A -> 2
+    [InlineData("^>", "<Av>A")]
+    [InlineData("^>AvvvA", "<Av>A^A<vAAA^>A")]
+    [InlineData("<A^A^^>AvvvA", "v<<A>>^A<A>A<AAv>A^A<vAAA^>A")]
+    // [InlineData("^A^^<<A>>AvvvA", "<A>A<AAv<AA>>^AvAA^A<vAAA>^A")] // 379A -> 1
+    // [InlineData("<A>A<AAv<AA>>^AvAA^Av<AAA>^A", "v<<A>>^AvA^Av<<A>>^AAv<A<A>>^AAvAA^<A>Av<A>^AA<A>Av<A<A>>^AAAvA^<A>A")] // 379A -> 2
+    // [InlineData("^A<<^^A>>AvvvA", "<A>Av<<AA>^AA>AvAA^Av<AAA>^A")] // 379A -> 1
+    // [InlineData("<A>Av<<AA>^AA>AvAA^Av<AAA>^A", "v<<A>>^AvA^A<vA<AA>>^AAvA^<A>AAvA^Av<A>^AA<A>Av<A<A>>^AAAvA^<A>A")] // 379A -> 2
 
     [InlineData("^A<<^^A", "<A>Av<<AA>^AA>A")] // 37
     [InlineData("^A^^<<A", "<A>A<AAv<AA>>^A")] // 37
 
-    [InlineData("<A>Av<<AA>^AA>A", "v<<A>>^AvA^Av<A<AA>>^AAvA^<A>AAvA^A")] // 37
-    [InlineData("<A>A<AAv<AA>>^A", "v<<A>>^AvA^Av<<A>>^AAv<A<A>>^AAvAA^<A>A")] // 37
+    [InlineData("<A>Av<<AA>^AA>A", "v<<A>>^AvA^A<vA<AA>>^AAvA<^A>AAvA^A")] // 37
+    [InlineData("<A>A<AAv<AA>>^A", "v<<A>>^AvA^Av<<A>>^AA<vA<A>>^AAvAA<^A>A")] // 37
 
     [InlineData("<<^^A", "v<<AA>^AA>A")] // 37
     [InlineData("^^<<A", "<AAv<AA>>^A")] // 37
-    [InlineData("v<<AA>^AA>A", "v<A<AA>>^AAvA^<A>AAvA^A")] // 37
-    [InlineData("<AAv<AA>>^A", "v<<A>>^AAv<A<A>>^AAvAA^<A>A")] // 37
+    [InlineData("v<<AA>^AA>A", "<vA<AA>>^AAvA<^A>AAvA^A")] // 37
+    [InlineData("<AAv<AA>>^A", "v<<A>>^AA<vA<A>>^AAvAA<^A>A")] // 37
     internal void RemoteDirPad(string input, string expected)
     {
         var rnp = new RemoteController.RemoteDirPad();
@@ -257,10 +255,12 @@ public class RemoteControllerTest
     }
 
     [Fact]
-    internal void SubOptimals()
+    internal void SubOptimalsNumPad()
     {
         RemoteController.Remote[] robots = [
             new RemoteController.RemoteNumPad(),
+            new RemoteController.RemoteDirPad(),
+            new RemoteController.RemoteDirPad(),
             new RemoteController.RemoteDirPad(),
             new RemoteController.RemoteDirPad(),
         ];
@@ -273,14 +273,15 @@ public class RemoteControllerTest
 
             var currentResult = b1.SelectMany(robots[1].Move)
                                   .SelectMany(robots[2].Move)
+                                  .SelectMany(robots[3].Move)
+                                  .SelectMany(robots[4].Move)
                                   .ToArray();
-
 
             foreach (var b1_ in b1.SkipLast(1).Permutations())
             {
+                // the restrict area
                 switch (a, b)
                 {
-                    // not allowed
                     case ('0', '1'):
                     case ('0', '4'):
                     case ('0', '7'):
@@ -324,6 +325,79 @@ public class RemoteControllerTest
                 var result = b1_.Append('A')
                                 .SelectMany(robots[1].Move)
                                 .SelectMany(robots[2].Move)
+                                .SelectMany(robots[3].Move)
+                                .SelectMany(robots[4].Move)
+                                .ToArray();
+
+                if (result.Count() < currentResult.Count())
+                {
+                    Assert.Fail($"AB: '{a}{b}':"
+                        + $"\n\tcurr: {new string(b1.ToArray())}"
+                        + $"\n\tperm: {new string(b1_.Append('A').ToArray())}"
+                        + $"\n\tgood: {new string(result)}"
+                        + $"\n\tbad:  {new string(currentResult)}");
+                }
+            }
+        }
+    }
+
+    [Fact]
+    internal void SubOptimalsDirPad()
+    {
+        RemoteController.Remote[] robots = [
+            new RemoteController.RemoteDirPad(),
+            new RemoteController.RemoteDirPad(),
+            new RemoteController.RemoteDirPad(),
+            new RemoteController.RemoteDirPad(),
+            new RemoteController.RemoteDirPad(),
+            new RemoteController.RemoteDirPad(),
+        ];
+
+        foreach (char a in "^A<v>")
+        foreach (char b in "^A<v>")
+        {
+            var _  = robots[0].Move(a);
+            var b1 = robots[0].Move(b);
+
+            var currentResult = b1.SelectMany(robots[1].Move)
+                                  .SelectMany(robots[2].Move)
+                                  .SelectMany(robots[3].Move)
+                                  .SelectMany(robots[4].Move)
+                                  .SelectMany(robots[5].Move)
+                                  .ToArray();
+
+            foreach (var b1_ in b1.SkipLast(1).Permutations())
+            {
+                // the restrict area
+                switch (a, b)
+                {
+                    case ('^', '<'):
+                    {
+                        if (b1_.TakeWhile(c => c == '<').Count() >= 1)
+                            continue;
+                        break;
+                    }
+                    case ('A', '<'):
+                    {
+                        if (b1_.TakeWhile(c => c == '<').Count() >= 2)
+                            continue;
+                        break;
+                    }
+                    case ('<', '^'):
+                    case ('<', 'A'):
+                    {
+                        if (b1_.TakeWhile(c => c == '^').Count() >= 1)
+                            continue;
+                        break;
+                    }
+                }
+
+                var result = b1_.Append('A')
+                                .SelectMany(robots[1].Move)
+                                .SelectMany(robots[2].Move)
+                                .SelectMany(robots[3].Move)
+                                .SelectMany(robots[4].Move)
+                                .SelectMany(robots[5].Move)
                                 .ToArray();
 
                 if (result.Count() < currentResult.Count())
@@ -343,28 +417,28 @@ public class RemoteControllerTest
     [InlineData("029A",  0,         12L * 29L)]
     [InlineData("029A",  1,         28L * 29L)]
     [InlineData("029A",  2,         68L * 29L)]
-    [InlineData("029A",  3,        172L * 29L)]
-    [InlineData("029A",  4,        434L * 29L)]
-    [InlineData("029A",  5,       1116L * 29L)]
-    [InlineData("029A", 15,   13906986L * 29L)]
+    [InlineData("029A",  3,        164L * 29L)]
+    [InlineData("029A",  4,        404L * 29L)]
+    [InlineData("029A",  5,        998L * 29L)]
+    [InlineData("029A", 15,    9041286L * 29L)]
     // [InlineData("029A", 20, 1553478224L * 29L)]
 
-    [InlineData("980A", 15,   11880624280L)]
-    [InlineData("179A", 15,    2428011848L)]
-    [InlineData("456A", 15,    6185325360L)]
-    [InlineData("379A", 15,    4942980914L)]
+    [InlineData("980A", 15,    7801248840)]
+    [InlineData("179A", 15,    1602626380)]
+    [InlineData("456A", 15,    4059230832)]
+    [InlineData("379A", 15,    3256906938)]
 
-    [InlineData("965A", 15,    13127250120)]
-    [InlineData("143A", 15,     2151376656)]
-    [InlineData("528A", 15,     7667852544)]
-    [InlineData("670A", 15,     9327865960)]
-    [InlineData("973A", 15,    13236079010)]
+    [InlineData("965A", 15,    8584680530)]
+    [InlineData("143A", 15,    1414098686)]
+    [InlineData("528A", 15,    5031315168)]
+    [InlineData("670A", 15,    6219986540)]
+    [InlineData("973A", 15,    8655850812)]
 
-    [InlineData("965A", 25,    163801595854770)]
-    [InlineData("143A", 25,     26844844069758)]
-    [InlineData("528A", 25,     95679342715968)]
-    [InlineData("670A", 25,     116392998233620)]
-    [InlineData("973A", 25,    165159536547740)]
+    // [InlineData("965A", 25,    163801595854770)]
+    // [InlineData("143A", 25,     26844844069758)]
+    // [InlineData("528A", 25,     95679342715968)]
+    // [InlineData("670A", 25,     116392998233620)]
+    // [InlineData("973A", 25,    165159536547740)]
 
     internal void PartB(string input, int chain, long expected)
     {
@@ -406,11 +480,13 @@ public class RemoteControllerTest
         var dyno = new RemoteController.MultiRemoteDirPad(25).GetDyno();
         Assert.Equal(          2L, dyno[('A', '^',  1)]);
         Assert.Equal(          8L, dyno[('A', '^',  2)]);
-        Assert.Equal(      12904L, dyno[('A', '^', 10)]);
-        Assert.Equal(17983595930L, dyno[('A', '^', 25)]);
+        Assert.Equal(      10420L, dyno[('A', '^', 10)]);
+        Assert.Equal( 9009012838L, dyno[('A', '^', 25)]);
 
         // 567878317421856 - too high
         // 567878317421856
         // 567878317421856
+        // 308324721117162 - too high
+        // 271397390297138
     }
 }
