@@ -11,6 +11,7 @@ class LanParty : Solver
         var graph = input.Lines()
                          .Select(line => (a: line.Substring(0, 2),
                                           b: line.Substring(3, 2)))
+                         .SelectMany(edge => new (string, string)[] {edge, edge.Swap()})
                          .ToList()
                          .ToGraph();
 

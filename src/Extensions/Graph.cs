@@ -18,7 +18,6 @@ class Graph<TVertex> where TVertex : notnull
         foreach (var edge in edges)
         {
             _adjacency[this[edge.a], this[edge.b]] = true;
-            _adjacency[this[edge.b], this[edge.a]] = true;
         }
     }
 
