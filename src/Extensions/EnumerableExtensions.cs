@@ -95,6 +95,48 @@ static class EnumerableExtensions
                 yield return item;
         }
     }
+
+    // GCC for undirected graph
+    internal static IDictionary<TVertex, IList<TVertex>> GCC<TVertex>(this IEnumerable<(TVertex a, TVertex b)> edges)
+        where TVertex : IComparable<TVertex>
+    {
+        var verteces = edges.SelectMany(edge => new TVertex[]{edge.a, edge.b})
+                            .ToArray();
+        var visited = new HashSet<TVertex>();
+        var components = new Dictionary<TVertex, IList<TVertex>>();
+
+        foreach (var v in verteces)
+        {
+            if (visited.Contains(v))
+                continue;
+
+            components.Add(v, new List<TVertex> { v });
+            var stack = new Stack<TVertex>();
+            stack.Push(v);
+
+            while (stack.Any())
+            {
+                var u = stack.Pop();
+                visited.Add(u);
+
+                foreach (var (a, b) in edges)
+                {
+                    if (a.Equals(v) && !visited.Contains(b))
+                    {
+                        components[v].Add(b);
+                        stack.Push(b);
+                    }
+                    if (b.Equals(v) && !visited.Contains(a))
+                    {
+                        components[v].Add(a);
+                        stack.Push(a);
+                    }
+                }
+            }
+        }
+
+        return components;
+    }
 }
 
 public class EnumerableExtensionsTest
