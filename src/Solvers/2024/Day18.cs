@@ -18,7 +18,7 @@ class RamRunner : Solver
     internal override object Solve(string input)
     {
         var inputs = input.Lines()
-                          .SelectMany(line => line.Parse<int>(','))
+                          .SelectMany(line => line.Split(',').Parse<int>())
                           .Chunk(2)
                           .Select(args => (x: args[0], y: args[1]))
                           .ToArray();

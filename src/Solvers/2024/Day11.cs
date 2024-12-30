@@ -17,7 +17,8 @@ class Blinker : Solver
     }
 
     internal override object Solve(string input) =>
-        input.Parse<int>()
+        input.Words()
+             .Parse<int>()
              .Select(stone => Dyno(stone, Blink))
              .Sum();
 

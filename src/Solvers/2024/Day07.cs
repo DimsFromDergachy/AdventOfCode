@@ -14,7 +14,7 @@ class Repairer : Solver
 
     (long result, long[] args) Parse(string line) => (
         result: long.Parse(line.Split(':')[0]),
-        args: line.Split(':')[1].Parse<long>().ToArray()
+        args: line.Split(':')[1].Words().Parse<long>().ToArray()
     );
 
     bool Check(long exp, long[] args) => Results(exp, 0, args).Any(r => r == exp);

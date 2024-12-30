@@ -8,7 +8,7 @@ class RedNosedChecker : Solver
 
     internal override object Solve(string input) =>
         input.Lines()
-             .Select(line => line.Parse<int>())
+             .Select(line => line.Words().Parse<int>())
              .Count(Part == Part.A ? IsSave : IsSaver);
 
     bool IsSave(IEnumerable<int> report) =>

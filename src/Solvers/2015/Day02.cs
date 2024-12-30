@@ -5,7 +5,7 @@ class SolverA : Solver
 {
     internal override object Solve(string input) =>
         input.Lines()
-             .Select(line => line.Parse<int>('x').ToArray())
+             .Select(line => line.Split('x').Parse<int>().ToArray())
              .Select(Wrapping)
              .Sum();
 
@@ -22,7 +22,7 @@ class SolverB : Solver
 {
     internal override object Solve(string input) =>
         input.Lines()
-             .Select(line => line.Parse<int>('x').ToArray())
+             .Select(line => line.Words('x').Parse<int>().ToArray())
              .Select(Ribboning)
              .Sum();
 

@@ -88,7 +88,7 @@ EFGH";
 4 5 6";
 
         var array = input.Lines()
-                         .Select(line => line.Parse<int>())
+                         .Select(line => line.Words().Parse<int>())
                          .ToArray();
         Assert.Equal([((0, 0), 1), ((1, 0), 2), ((2, 0), 3),
                       ((0, 1), 4), ((1, 1), 5), ((2, 1), 6)],

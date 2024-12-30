@@ -19,8 +19,9 @@ class Computer : Solver
         };
 
         var program = lines.Last()
-                           .Skip("Program: ".Count())
-                           .Parse<int>(',')
+                           .Substring("Program: ".Count())
+                           .Split(',')
+                           .Parse<int>()
                            .ToArray();
 
         if (Part == Part.A)
