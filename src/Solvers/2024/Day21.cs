@@ -200,7 +200,6 @@ internal class RemoteController : Solver
             return dyno;
         }
     }
-    // <|A  >>^A
 }
 
 public class RemoteControllerTest
@@ -232,10 +231,6 @@ public class RemoteControllerTest
     [InlineData("^>", "<Av>A")]
     [InlineData("^>AvvvA", "<Av>A^A<vAAA^>A")]
     [InlineData("<A^A^^>AvvvA", "v<<A>>^A<A>A<AAv>A^A<vAAA^>A")]
-    // [InlineData("^A^^<<A>>AvvvA", "<A>A<AAv<AA>>^AvAA^A<vAAA>^A")] // 379A -> 1
-    // [InlineData("<A>A<AAv<AA>>^AvAA^Av<AAA>^A", "v<<A>>^AvA^Av<<A>>^AAv<A<A>>^AAvAA^<A>Av<A>^AA<A>Av<A<A>>^AAAvA^<A>A")] // 379A -> 2
-    // [InlineData("^A<<^^A>>AvvvA", "<A>Av<<AA>^AA>AvAA^Av<AAA>^A")] // 379A -> 1
-    // [InlineData("<A>Av<<AA>^AA>AvAA^Av<AAA>^A", "v<<A>>^AvA^A<vA<AA>>^AAvA^<A>AAvA^Av<A>^AA<A>Av<A<A>>^AAAvA^<A>A")] // 379A -> 2
 
     [InlineData("^A<<^^A", "<A>Av<<AA>^AA>A")] // 37
     [InlineData("^A^^<<A", "<A>A<AAv<AA>>^A")] // 37
@@ -421,7 +416,6 @@ public class RemoteControllerTest
     [InlineData("029A",  4,        404L * 29L)]
     [InlineData("029A",  5,        998L * 29L)]
     [InlineData("029A", 15,    9041286L * 29L)]
-    // [InlineData("029A", 20, 1553478224L * 29L)]
 
     [InlineData("980A", 15,    7801248840)]
     [InlineData("179A", 15,    1602626380)]
@@ -434,49 +428,14 @@ public class RemoteControllerTest
     [InlineData("670A", 15,    6219986540)]
     [InlineData("973A", 15,    8655850812)]
 
-    // [InlineData("965A", 25,    163801595854770)]
-    // [InlineData("143A", 25,     26844844069758)]
-    // [InlineData("528A", 25,     95679342715968)]
-    // [InlineData("670A", 25,     116392998233620)]
-    // [InlineData("973A", 25,    165159536547740)]
-
     internal void PartB(string input, int chain, long expected)
     {
         Assert.Equal(expected, (long) new RemoteController(Part.B, chain).Solve(input));
-        // Assert.Equal(        28L, (long) new RemoteController(Part.B,  1).Solve(input) / 29L);
-        // Assert.Equal(        68L, (long) new RemoteController(Part.B,  2).Solve(input) / 29L);
-        // Assert.Equal(       172L, (long) new RemoteController(Part.B,  3).Solve(input) / 29L);
-        // Assert.Equal(       434L, (long) new RemoteController(Part.B,  4).Solve(input) / 29L);
-        // Assert.Equal(      1116L, (long) new RemoteController(Part.B,  5).Solve(input) / 29L);
-        // Assert.Equal(  13906986L, (long) new RemoteController(Part.B, 15).Solve(input) / 29L);
-        // Assert.Equal(1553478224L, (long) new RemoteController(Part.B, 20).Solve(input) / 29L);
     }
 
-    [Theory]
-    [InlineData("^",  0,      1)] // ^
-    // [InlineData("^",  1,      2)] // <A
-    // [InlineData("^",  2,      8)] // v<<A>>^A
-    // [InlineData("^",  3,     18)] // v<A<AA>>^AvAA<^A>A
-    // [InlineData("^",  4,     46)] // 
-    // [InlineData("^",  5,    116)] // 
-    // [InlineData("^",  6,    298)] // 
-    // [InlineData("^",  7,    762)] // 
-    // [InlineData("^",  8,   1958)] // 
-    // [InlineData("^",  9,   5024)] // 
-    // [InlineData("^", 10,  12904)] // 
-    // [InlineData("^", 11,  33134)] // 
-    // [InlineData("^", 12,  85094)] // 
-    // [InlineData("^", 13, 218526)] // 
-    // [InlineData("^", 25, 17983595930)] // 
-    internal void PatternOfPartB(string ch, int rs, int expected)
+    [Fact]
+    internal void PatternOfPartB()
     {
-        // var robots = Enumerable.Range(0, rs)
-        //                        .Select(_ => new RemoteController.RemoteDirPad())
-        //                        .ToArray();
-
-        // var result = robots.Aggregate(ch.Skip(0), (s, r) => r.Moves(s));
-        // Assert.Equal(expected, result.LongCount());
-
         var dyno = new RemoteController.MultiRemoteDirPad(25).GetDyno();
         Assert.Equal(          2L, dyno[('A', '^',  1)]);
         Assert.Equal(          8L, dyno[('A', '^',  2)]);
