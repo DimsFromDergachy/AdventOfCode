@@ -12,30 +12,146 @@ class WiresMess : Solver
 
     internal override object Solve(string input)
     {
-        var wires = input.Lines()
-                         .Where(line => wire.IsMatch(line))
-                         .Select(line => wire.Match(line).Groups)
-                         .Select(gs => (wire: gs[1].Value,
-                                         bit: int.Parse(gs[2].Value) > 0))
-                         .ToList();
+        var wires = ParseWires(input);
+        var gates = ParseGates(input);
 
-        var gates = input.Lines()
-                         .Where(line => gate.IsMatch(line))
-                         .Select(line => gate.Match(line).Groups)
-                         .Select(gs => (wire: gs[4].Value,
-                                          op: gs[2].Value,
-                                        arg1: gs[1].Value,
-                                        arg2: gs[3].Value))
-                         .ToList();
+        if (Part == Part.A)
+            return Solver(wires, gates).Where(wire => wire.Key.StartsWith('z'))
+                                       .OrderBy(wire => wire.Key)
+                                       .Reverse()
+                                       .Aggregate(0L, (res, wire) => 2 * res + (wire.Value ? 1 : 0));
 
-        return Solver(wires, gates).Where(wire => wire.Key.StartsWith('z'))
-                                   .OrderBy(wire => wire.Key)
-                                   .Reverse()
-                                   .Aggregate(0L, (res, wire) => 2 * res + (wire.Value ? 1 : 0));
+        return 42;
     }
 
-    private IDictionary<string, bool> Solver(List<(string wire, bool bit)> wires,
-                        List<(string wire, string op, string arg1, string arg2)> gates)
+    List<Wire> ParseWires(string input)
+        => input.Lines()
+                .Where(line => wire.IsMatch(line))
+                .Select(line => wire.Match(line).Groups)
+                .Select(gs => new Wire
+                {
+                    wire = gs[1].Value,
+                    bit = int.Parse(gs[2].Value) > 0,
+                })
+                .ToList();
+
+    internal List<Gate> ParseGates(string input)
+        => input.Lines()
+                .Where(line => gate.IsMatch(line))
+                .Select(line => gate.Match(line).Groups)
+                .Select(gs => new Gate
+                {
+                    wire = gs[4].Value,
+                    op   = gs[2].Value,
+                    arg1 = gs[1].Value,
+                    arg2 = gs[3].Value,
+                })
+                .ToList();
+
+    internal IEnumerable<(int i, int x, int y, int z, int z2)> FailBit(
+        Gate[] gates,
+        int bit)
+    {
+        var wires_ = new Wire[90];
+
+        for (int i = 0; i <= 44; i++)
+        {
+            wires_[ 0 + i] = new Wire { wire = $"x{i:D2}", bit = false, };
+            wires_[45 + i] = new Wire { wire = $"y{i:D2}", bit = false, };
+        }
+
+        foreach (var (x, y, z1, z2) in new (int, int, int, int)[]
+            {(0, 0, 0, 0), (0, 1, 1, 0), (1, 0, 1, 0), (1, 1, 0, 1)})
+        {
+            wires_[ 0 + bit].bit = x > 0;
+            wires_[45 + bit].bit = y > 0;
+
+            var result = Solver(wires_, gates);
+            var e1 = result[$"z{bit+0:D2}"] ? 1 : 0;
+            var e2 = result[$"z{bit+1:D2}"] ? 1 : 0;
+
+            if (e1 != z1 || e2 != z2)
+            {
+                yield return (bit, x, y, e1, e2);
+            }
+        }
+    }
+
+    internal IEnumerable<(string v, int d)> SubTree(Gate[] gates, int bit)
+    {
+        var res = new List<(string w, int d)>();
+        var queue = new Queue<(string w, int d)>();
+        queue.Enqueue(($"z{bit:D2}", 0));
+
+        while (queue.Any())
+        {
+            var (v, d) = queue.Dequeue();
+            yield return (v, d);
+
+            if (gates.Any(g => g.wire == v))
+            {
+                var gate = gates.Single(g => g.wire == v);
+
+                queue.Enqueue((gate.arg1, d + 1));
+                queue.Enqueue((gate.arg2, d + 1));
+            }
+        }
+    }
+
+    internal IEnumerable<Gate> Find(Gate[] gates, int bit)
+    {
+        {
+            foreach (var g1 in gates)
+            // foreach (var g2 in gates)
+            // foreach (var g3 in gates)
+            {
+                var wire1 = g1.wire;
+                var wire2 = "z44";
+                var wire3 = "z45";
+                if (wire1.StartsWith("x") || wire1.StartsWith("y"))
+                    continue;
+
+                if (wire2.StartsWith("x") || wire2.StartsWith("y"))
+                    continue;
+
+                if (wire3.StartsWith("x") || wire3.StartsWith("y"))
+                    continue;
+
+                var gate1 = gates.First(g => g.wire == wire1);
+                var gate2 = gates.First(g => g.wire == wire2);
+                var gate3 = gates.First(g => g.wire == wire3);
+                var idx1 = Array.IndexOf(gates, gate1);
+                var idx2 = Array.IndexOf(gates, gate2);
+                var idx3 = Array.IndexOf(gates, gate3);
+                var origOp1 = gate1.op;
+                var origOp2 = gate2.op;
+                var origOp3 = gate3.op;
+
+                foreach (var op1 in new string[] {"AND", "OR", "XOR"})
+                foreach (var op2 in new string[] {"AND", "OR", "XOR"})
+                foreach (var op3 in new string[] {"AND", "OR", "XOR"})
+                {
+                    gates[idx1].op = op1;
+                    gates[idx2].op = op2;
+                    gates[idx3].op = op3;
+                    if (!FailBit(gates, bit).Any())
+                    {
+                        yield return gate1;
+                        yield return gate2;
+                        yield return gate3;
+                    }
+                }
+
+                gates[idx1].op = origOp1;
+                gates[idx2].op = origOp2;
+                gates[idx3].op = origOp3;
+            }
+        }
+    }
+
+    private IDictionary<string, bool> Solver(
+        IList<Wire> wires,
+        IList<Gate> gates)
     {
         var memo = wires.ToDictionary(wire => wire.wire, wire => wire.bit);
 
@@ -84,6 +200,20 @@ class WiresMess : Solver
     }
 }
 
+struct Wire
+{
+    internal string wire;
+    internal bool bit;
+}
+
+struct Gate
+{
+    internal string wire;
+    internal string op;
+    internal string arg1;
+    internal string arg2;
+}
+
 public class WiresMessTest
 {
     [Fact]
@@ -101,7 +231,7 @@ x00 AND y00 -> z00
 x01 XOR y01 -> z01
 x02 OR y02 -> z02
 ";
-        Assert.Equal(4, new WiresMess(Part.A).Solve(input));
+        Assert.Equal(4L, new WiresMess(Part.A).Solve(input));
     }
 
     [Fact]
@@ -157,6 +287,52 @@ tgd XOR rvg -> z12
 tnw OR pbm -> gnj
 ";
 
-        Assert.Equal(2024, new WiresMess(Part.A).Solve(input));
+        Assert.Equal(2024L, new WiresMess(Part.A).Solve(input));
+    }
+
+    [Fact]
+    internal void Input()
+    {
+        var input = File.ReadAllText("./Solvers/2024/Data/Day24");
+
+        Assert.Equal(57632654722854L, new WiresMess(Part.A).Solve(input));
+        // Assert.Equal(            42L, new WiresMess(Part.B).Solve(input));
+    }
+
+    [Fact]
+    internal void FailBits()
+    {
+        var input = File.ReadAllText("./Solvers/2024/Data/Day24");
+
+        // Fail bits: 6,14,15,22,23,38,39
+
+        var solver = new WiresMess(Part.B);
+        var gates = solver.ParseGates(input).ToArray();
+        var result = Enumerable.Range(0, 44)
+                               .SelectMany(bit => solver.FailBit(gates, bit))
+                               .Select(f => f.i)
+                               .Distinct()
+                               .ToArray();
+
+        Assert.Equal([6,14,15,22,23,38,39], result);
+    }
+
+    // [Theory]
+    // [InlineData(06)]
+    // [InlineData(14)]
+    // [InlineData(15)]
+    // [InlineData(22)]
+    // [InlineData(23)]
+    // [InlineData(38)]
+    // [InlineData(39)]
+    internal void Vanted(int bit)
+    {
+        var input = File.ReadAllText("./Solvers/2024/Data/Day24");
+
+        var solver = new WiresMess(Part.B);
+        var gates = solver.ParseGates(input).ToArray();
+
+        Assert.Equal((object) bit, solver.Find(gates, bit).ToArray());
+        Assert.Equal((object) bit, solver.SubTree(gates, bit).ToArray());
     }
 }
