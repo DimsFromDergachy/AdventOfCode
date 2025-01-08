@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <None Update="./Solvers/2024/Data/Day05" CopyToOutputDirectory="Always" />
+    <None Update="./Solvers/2024/Data/Day20" CopyToOutputDirectory="Always" />
     <None Update="./Solvers/2024/Data/Day22" CopyToOutputDirectory="Always" />
     <None Update="./Solvers/2024/Data/Day24" CopyToOutputDirectory="Always" />
   </ItemGroup>

@@ -26,110 +26,92 @@ class Cheater : Solver
         return Cheats(maze).Count(p => p.cost >= MinCost);
     }
 
-    IEnumerable<(int start, int end, int cost)> Cheats(char[,] maze)
+    internal IEnumerable<((int x, int y) point, int score)> GetTrack(char[,] maze)
     {
-        var S = maze.ToEnumerable()
-                    .Single(pair => pair.Value == 'S')
-                    .Index;
+        var curr = maze.ToEnumerable()
+                          .Single(pair => pair.Value == 'S')
+                          .Index;
 
-        var dyno = new int[maze.GetLength(1), maze.GetLength(0)];
-        Array.ForEach(dyno.GetIndexes().ToArray(), pair => dyno[pair.x, pair.y] = int.MaxValue);
-        dyno[S.x, S.y] = 0;
+        int score = 0;
+        var prev = curr;
 
-        var stack = new Stack<(int x, int y)>();
-        stack.Push(S);
-        var track = new List<((int x, int y) point, int score)>();
+        yield return (curr, score++);
 
-        while (stack.Any())
+        do
         {
-            var (x, y) = stack.Pop();
-            track.Add(((x, y), dyno[x, y]));
-
             foreach (var (dx, dy) in dirs)
             {
-                var next = (x: x + dx, y: y + dy);
+                var next = (x: curr.x + dx, y: curr.y + dy);
 
-                if (maze[next.x, next.y] != '#'
-                    &&
-                    dyno[next.x, next.y] > dyno[x, y] + 1)
+                if (maze[next.x, next.y] != '#' && next != prev)
                 {
-                    stack.Push(next);
-                    dyno[next.x, next.y] = dyno[x, y] + 1;
+                    (prev, curr) = (curr, next);
+                    break;
                 }
             }
+            yield return (curr, score++);
         }
+        while (maze[curr.x, curr.y] != 'E');
+    }
 
-        var cheats = new HashSet<((int x, int y) cheatStart, (int x, int y) cheatEnd, int cheatDiscount)>();
+    IEnumerable<(int start, int end, int cost)> Cheats(char[,] maze)
+    {
+        var M = maze.GetLength(1);
+        var N = maze.GetLength(0);
+        var dist = new int[M * N, M * N];
 
-        foreach (var (cheatStart, scoreStart) in track)
-        {
-            var startScore = dyno[cheatStart.x, cheatStart.y];
+        foreach (var (x, y) in dist.GetIndexes())
+            dist[x, y] = int.MaxValue / 2;
 
-            Array.ForEach(maze.ToEnumerable()
-                              .Where(pair => pair.Value == '#')
-                              .Select(pair => pair.Index)
-                              .ToArray(),
-                          index => dyno[index.x, index.y] = int.MaxValue );
-
-            var queue = new Queue<(int x, int y)>();
-            queue.Enqueue(cheatStart);
-
-            while (queue.Any())
+        foreach (var (x, y) in maze.GetIndexes())
+            if (maze[x, y] == '#')
             {
-                var (x, y) = queue.Dequeue();
-
-                // cheat's over
-                if (dyno[x, y] > startScore + MaxCheatPath)
-                    continue;
-
+                dist[x + N * y, x + N * y] = 0;
                 foreach (var (dx, dy) in dirs)
+                try
                 {
-                    try
-                    {
-                        var (nx, ny) = (x + dx, y + dy);
-                        if (maze[nx, ny] == '#' && dyno[x, y] + 1 < dyno[nx, ny])
-                        {
-                            dyno[nx, ny] = dyno[x, y] + 1;
-                            queue.Enqueue((nx, ny));
-                        }
-                    }
-                    catch (IndexOutOfRangeException) {}
-                }
-            }
-
-            foreach (var (cheatEnd, scoreEnd) in track)
-            {
-                if (scoreEnd <= scoreStart)
-                    continue;
-
-                var cheatDiscountMax = int.MinValue;
-
-                foreach (var (dx, dy) in dirs)
-                {
-                    var (nx, ny) = (cheatEnd.x + dx, cheatEnd.y + dy);
-
-                    if (maze[nx, ny] != '#')
+                    var next = (x: x + dx, y: y + dy);
+                    if (maze[next.x, next.y] != '#')
                         continue;
 
-                    var cheatLenght = dyno[nx, ny] + 1 - dyno[cheatStart.x, cheatStart.y];
-
-                    if (cheatLenght > MaxCheatPath)
-                        continue;
-
-                    var cheatDiscount = dyno[cheatEnd.x, cheatEnd.y] - dyno[cheatStart.x, cheatStart.y] - cheatLenght;
-
-                    if (cheatDiscount > 0 && cheatDiscount > cheatDiscountMax)
-                    {
-                        cheatDiscountMax = cheatDiscount;
-                    }
+                    dist[x + N * y, next.x + N * next.y] = 1;
+                    dist[next.x + N * next.y, x + N * y] = 1;
                 }
-                cheats.Add((cheatStart, cheatEnd, cheatDiscountMax));
+                catch (IndexOutOfRangeException) {}
             }
-        }
 
-        foreach (var (cheatStart, cheatEnd, cheatDiscount) in cheats)
+        // Floyd–Warshall algorithm
+        for (int k = 0; k < M * N; k++)
+        for (int i = 0; i < M * N; i++)
+        for (int j = 0; j < M * N; j++)
+            if (dist[i, j] > dist[i, k] + dist[k, j])
+                dist[i, j] = dist[i, k] + dist[k, j];
+
+        var track = GetTrack(maze).ToList();
+
+        foreach (var v in track)
+        foreach (var w in track)
         {
-            yield return (dyno[cheatStart.x, cheatStart.y], dyno[cheatEnd.x, cheatEnd.y], cheatDiscount);
+            if (v.score >= w.score)
+                continue;
+
+            var maxCheat = 0;
+
+            foreach (var dv in dirs)
+            foreach (var dw in dirs)
+            {
+                var v_ = (x: v.point.x + dv.dx, y: v.point.y + dv.dy);
+                var w_ = (x: w.point.x + dw.dx, y: w.point.y + dw.dy);
+
+                var path = dist[v_.x + N * v_.y, w_.x + N * w_.y] + 2;
+                var cheat = (w.score - v.score) - path;
+
+                if (path <= MaxCheatPath && cheat > 0 && cheat > maxCheat)
+                    maxCheat = cheat;
+            }
+
+            if (maxCheat > 0)
+                yield return (v.score, w.score, maxCheat);
         }
     }
 }
@@ -177,5 +159,31 @@ public class CheaterTest
         Assert.Equal( 3, new Cheater(Part.B, 76).Solve(input));
         Assert.Equal( 7, new Cheater(Part.B, 74).Solve(input));
         Assert.Equal(19, new Cheater(Part.B, 72).Solve(input));
+    }
+
+    [Fact]
+    internal void GetTrack()
+    {
+        var input = @"
+######
+#E##S#
+#....#
+######";
+
+        var maze = input.Lines().ToArray();
+
+        var solver = new Cheater(Part.A);
+        var track = solver.GetTrack(maze).ToList();
+        Assert.Equal(6, track.Count());
+        Assert.Equal(((4, 1), 0), track.First());
+        Assert.Equal(((1, 1), 5), track.Last());
+    }
+
+    [Fact]
+    internal void PartA()
+    {
+        var input = File.ReadAllText("./Solvers/2024/Data/Day20");
+
+        Assert.Equal(1530, new Cheater(Part.A).Solve(input));
     }
 }
