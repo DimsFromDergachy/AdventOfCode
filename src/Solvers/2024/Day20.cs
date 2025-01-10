@@ -23,10 +23,11 @@ class Cheater : Solver
         var maze = input.Lines()
                         .ToArray();
 
-        return Cheats(maze).Count(p => p.cost >= MinCost);
+        // return Cheats(maze).Count(p => p.cost >= MinCost);
+        return ManhattanTrick(maze).Count(p => p.cost >= MinCost);
     }
 
-    internal IEnumerable<((int x, int y) point, int score)> GetTrack(char[,] maze)
+    internal IEnumerable<((int x, int y) point, int score)> Track(char[,] maze)
     {
         var curr = maze.ToEnumerable()
                           .Single(pair => pair.Value == 'S')
@@ -65,29 +66,43 @@ class Cheater : Solver
 
         foreach (var (x, y) in maze.GetIndexes())
             if (maze[x, y] == '#')
-            {
                 dist[x + N * y, x + N * y] = 0;
+
+        foreach (var (sx, sy) in maze.GetIndexes())
+        {
+            if (maze[sx, sy] != '#')
+                continue;
+
+            #region Dijkstra
+            var queue = new Queue<(int x, int y)>();
+            queue.Enqueue((sx, sy));
+            var visited = new bool[M, N];
+            visited[sx, sy] = true;
+
+            while (queue.Any())
+            {
+                var (x, y) = queue.Dequeue();
                 foreach (var (dx, dy) in dirs)
-                try
                 {
-                    var next = (x: x + dx, y: y + dy);
-                    if (maze[next.x, next.y] != '#')
-                        continue;
+                    var (nx, ny) = (x + dx, y + dy);
+                    try
+                    {
+                        _ = maze[nx, ny];
 
-                    dist[x + N * y, next.x + N * next.y] = 1;
-                    dist[next.x + N * next.y, x + N * y] = 1;
+                        if (visited[nx, ny] || maze[nx, ny] != '#')
+                            continue;
+
+                        queue.Enqueue((nx, ny));
+                        visited[nx, ny] = true;
+                        dist[sx + N * sy, nx + N * ny] = dist[sx + N * sy, x + N * y] + 1;
+                        dist[nx + N * ny, sx + N * sy] = dist[sx + N * sy, x + N * y] + 1;
+                    } catch (IndexOutOfRangeException) {}
                 }
-                catch (IndexOutOfRangeException) {}
             }
+            #endregion
+        }
 
-        // Floyd–Warshall algorithm
-        for (int k = 0; k < M * N; k++)
-        for (int i = 0; i < M * N; i++)
-        for (int j = 0; j < M * N; j++)
-            if (dist[i, j] > dist[i, k] + dist[k, j])
-                dist[i, j] = dist[i, k] + dist[k, j];
-
-        var track = GetTrack(maze).ToList();
+        var track = Track(maze).ToList();
 
         foreach (var v in track)
         foreach (var w in track)
@@ -104,7 +119,7 @@ class Cheater : Solver
                 var w_ = (x: w.point.x + dw.dx, y: w.point.y + dw.dy);
 
                 var path = dist[v_.x + N * v_.y, w_.x + N * w_.y] + 2;
-                var cheat = (w.score - v.score) - path;
+                var cheat = w.score - v.score - path;
 
                 if (path <= MaxCheatPath && cheat > 0 && cheat > maxCheat)
                     maxCheat = cheat;
@@ -112,6 +127,24 @@ class Cheater : Solver
 
             if (maxCheat > 0)
                 yield return (v.score, w.score, maxCheat);
+        }
+    }
+
+    IEnumerable<(int start, int end, int cost)> ManhattanTrick(char[,] maze)
+    {
+        var track = Track(maze).ToList();
+
+        foreach (var v in track)
+        foreach (var w in track)
+        {
+            if (v.score >= w.score)
+                continue;
+
+            var dist = Math.Abs(v.point.x - w.point.x) + Math.Abs(v.point.y - w.point.y);
+            var cheat = w.score - v.score - dist;
+
+            if (dist <= MaxCheatPath && cheat > 0)
+                yield return (v.score, w.score, cheat);
         }
     }
 }
@@ -139,26 +172,23 @@ public class CheaterTest
 ###############
 ";
 
-        var cheats = new (int gr, int save)[]
-            {
-            };
-
-        // (1, 64) (1, 40) (1, 38) (1, 36)
-        // (1, 20) (3, 12) (2, 10) (4,  8)
-        // (2,  6) (14, 4) (14, 2)
-
         Assert.Equal( 0, new Cheater(Part.A, 65).Solve(input));
         Assert.Equal( 1, new Cheater(Part.A, 64).Solve(input));
         Assert.Equal( 2, new Cheater(Part.A, 40).Solve(input));
         Assert.Equal( 3, new Cheater(Part.A, 38).Solve(input));
         Assert.Equal( 4, new Cheater(Part.A, 36).Solve(input));
+        Assert.Equal( 5, new Cheater(Part.A, 20).Solve(input));
         Assert.Equal( 8, new Cheater(Part.A, 12).Solve(input));
+        Assert.Equal(10, new Cheater(Part.A, 10).Solve(input));
+        Assert.Equal(14, new Cheater(Part.A,  8).Solve(input));
+        Assert.Equal(16, new Cheater(Part.A,  6).Solve(input));
+        Assert.Equal(30, new Cheater(Part.A,  4).Solve(input));
         Assert.Equal(44, new Cheater(Part.A,  2).Solve(input));
         Assert.Equal(44, new Cheater(Part.A,  0).Solve(input));
 
         Assert.Equal( 3, new Cheater(Part.B, 76).Solve(input));
-        Assert.Equal( 7, new Cheater(Part.B, 74).Solve(input));
-        Assert.Equal(19, new Cheater(Part.B, 72).Solve(input));
+        Assert.Equal( 3 + 4, new Cheater(Part.B, 74).Solve(input));
+        Assert.Equal( 3 + 4 + 22, new Cheater(Part.B, 72).Solve(input));
     }
 
     [Fact]
@@ -173,7 +203,7 @@ public class CheaterTest
         var maze = input.Lines().ToArray();
 
         var solver = new Cheater(Part.A);
-        var track = solver.GetTrack(maze).ToList();
+        var track = solver.Track(maze).ToList();
         Assert.Equal(6, track.Count());
         Assert.Equal(((4, 1), 0), track.First());
         Assert.Equal(((1, 1), 5), track.Last());
@@ -184,6 +214,7 @@ public class CheaterTest
     {
         var input = File.ReadAllText("./Solvers/2024/Data/Day20");
 
-        Assert.Equal(1530, new Cheater(Part.A).Solve(input));
+        Assert.Equal(1530, new Cheater(Part.A).Solve(input)); 
+        Assert.Equal(1033983, new Cheater(Part.B).Solve(input));
     }
 }
