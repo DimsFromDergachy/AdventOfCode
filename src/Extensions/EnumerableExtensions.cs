@@ -1,3 +1,5 @@
+using System.Collections;
+
 static class EnumerableExtensions
 {
     // Scan [1,2,3,4,5] 0 (+) => [0,1,3,6,10,15]
@@ -98,9 +100,8 @@ static class EnumerableExtensions
 
     internal static IEnumerable<TSource> ToEnumerable<TSource>(this IEnumerator<TSource> enumerator)
     {
-        do
+        while (enumerator.MoveNext())
             yield return enumerator.Current;
-        while (enumerator.MoveNext());
     }
 }
 
@@ -171,5 +172,25 @@ public class EnumerableExtensionsTest
     public void Cycle()
     {
         Assert.Throws<ArgumentException>(() => Enumerable.Empty<int>().Cycle().ToList());
+    }
+
+    [Fact]
+    public void ToEnumerable()
+    {
+        var enumerator = new Enumerator();
+        var expected = new int[] { 1, 2, 3, 4, 5 };
+        var result = enumerator.ToEnumerable().ToArray();
+
+        Assert.Equal(expected, result);
+    }
+
+    class Enumerator : IEnumerator<int>
+    {
+        private int current = 0;
+        public int Current => current;
+        object IEnumerator.Current => Current;
+        public void Dispose() => throw new NotImplementedException();
+        public bool MoveNext() => ++current <= 5;
+        public void Reset() => current = 0;
     }
 }
