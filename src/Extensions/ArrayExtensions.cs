@@ -53,6 +53,22 @@ static class ArrayExtensions
             yield return array[index.x, index.y];
         }
     }
+
+    internal static TElem[,] AddBorders<TElem>(this TElem[,] array, TElem border, int size = 1)
+    {
+        var result = new TElem[array.GetLength(0) + 2 * size,
+                               array.GetLength(1) + 2 * size];
+
+        for (int y = 0; y < result.GetLength(1); y++)
+        for (int x = 0; x < result.GetLength(0); x++)
+            if (0 <= x - size && x - size < array.GetLength(0)
+             && 0 <= y - size && y - size < array.GetLength(1))
+                result[x, y] = array[x - size, y - size];
+            else
+                result[x, y] = border;
+
+        return result;
+    }
 }
 
 internal class _2D {}
@@ -93,5 +109,26 @@ EFGH";
         Assert.Equal([((0, 0), 1), ((1, 0), 2), ((2, 0), 3),
                       ((0, 1), 4), ((1, 1), 5), ((2, 1), 6)],
             array.ToEnumerable());
+    }
+
+    [Fact]
+    public void WithBorders()
+    {
+        var input = @"
+XOOXO
+OXXOX
+XOXXO
+";
+
+        var expected = @"
+.......
+.XOOXO.
+.OXXOX.
+.XOXXO.
+.......
+";
+
+        Assert.Equal(expected.Lines().ToArray(),
+                        input.Lines().ToArray().AddBorders('.'));
     }
 }

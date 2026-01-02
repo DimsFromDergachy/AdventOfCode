@@ -103,6 +103,17 @@ static class EnumerableExtensions
         while (enumerator.MoveNext())
             yield return enumerator.Current;
     }
+
+    // Unfold 3 (+2) => [3, 5, 7, 9, ..]
+    internal static IEnumerable<TElem> Unfold<TElem>(this TElem seed, Func<TElem, TElem> next)
+    {
+        do
+        {
+            yield return seed;
+            seed = next(seed);
+        }
+        while (true);
+    }
 }
 
 public class EnumerableExtensionsTest
@@ -192,5 +203,14 @@ public class EnumerableExtensionsTest
         public void Dispose() => throw new NotImplementedException();
         public bool MoveNext() => ++current <= 5;
         public void Reset() => current = 0;
+    }
+
+    [Fact]
+    public void Unfold()
+    {
+        var seed = 0;
+        int[] expected = [0, 1, 4, 13, 40, 121]; // a[i+1] = 3 * a[i] + 1
+
+        Assert.Equal(expected, seed.Unfold(x => 3 * x + 1).Take(6));
     }
 }
