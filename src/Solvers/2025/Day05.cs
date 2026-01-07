@@ -1,3 +1,5 @@
+using Year2025.Day05.BSTM;
+
 namespace Year2025.Day05;
 
 [Solver(2025, 5, Part.A)]
@@ -6,7 +8,24 @@ class IDs : Solver
 {
     internal IDs(Part part) : base(part) {}
 
-    internal override object Solve(string input) => 42;
+    internal override object Solve(string input)
+    {
+        var lines = input.Lines(StringSplitOptions.None);
+
+        var ranges = lines.TakeWhile(line => !line.Equals(string.Empty))
+                          .SelectMany(line => line.Split('-'))
+                          .Parse<long>()
+                          .Chunk(2)
+                          .Select(range => new BSTM.Range{ Left = range[0], Right = range[1]});
+
+        var ids = lines.SkipWhile(line => !line.Equals(string.Empty))
+                       .Skip(1)
+                       .Parse<long>();
+
+        var bstm = BSTM.BSTM.Build(ranges)!;
+
+        return ids.Count(id => bstm.In(id));
+    }
 }
 
 public class Test
@@ -14,8 +33,8 @@ public class Test
     [Fact]
     public void Example()
     {
-        var input = @"
-3-5
+        var input =
+@"3-5
 10-14
 16-20
 12-18
@@ -25,8 +44,7 @@ public class Test
 8
 11
 17
-32
-";
+32";
 
         Assert.Equal(3, new IDs(Part.A).Solve(input));
     }

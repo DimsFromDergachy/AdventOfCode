@@ -11,28 +11,39 @@ namespace Year2025.Day05.BSTM;
 //             \
 //              (8, 10)
 
+record Range
+{
+    internal required long Left;
+    internal required long Right;
 
+    public static bool operator <(long value, Range range) => value < range.Left;
+    public static bool operator >(long value, Range range) => value > range.Right;
+
+    public static bool operator <(Range range, long value) => range.Right < value;
+    public static bool operator >(Range range, long value) => range.Left > value;
+
+    public static implicit operator Range((long Left, long Right) value)
+        => new Range { Left = value.Left, Right = value.Right };
+}
+
+static class RangeExtensions
+{
+    internal static bool In(this long value, Range range) => range.Left <= value && value <= range.Right;
+    internal static bool Has(this Range range, long value) => value.In(range);
+}
 
 record Node
 {
     internal Node? LeftNode;
-    internal (long Left, long Right) Range;
+    internal required Range Range;
     internal Node? RightNode;
 
-    public static bool operator <(long value, Node node) => value < node.Range.Left;
-    public static bool operator >(long value, Node node) => value > node.Range.Right;
-    public static bool operator ==(long value, Node node) => !(value != node); // In
-    public static bool operator !=(long value, Node node) => value < node || node < value;
-
-    public static bool operator <(Node node, long value) => node.Range.Right < value;
-    public static bool operator >(Node node, long value) => node.Range.Left > value;
-    public static bool operator ==(Node node, long value) => !(node != value); // In
-    public static bool operator !=(Node node, long value) => node < value || value < node;
+    internal Node Merge(Range range) => Merge(range.Left, range.Right);
 
     internal Node Merge(long left, long right)
     {
         // go to left subtree
-        if (right < this)
+        if (right < this.Range)
         {
             return this with
             {
@@ -43,7 +54,7 @@ record Node
         }
 
         // go to right subtree
-        if (this < left)
+        if (left > this.Range)
         {
             return this with
             {
@@ -59,18 +70,18 @@ record Node
         return this;
     }
 
-    private (Node? updated, long updatedLeft) MergeToLeft(/*this*/ Node? current, long left)
+    private (Node? updated, long updatedLeft) MergeToLeft(Node? current, long left)
     {
         if (current is null)
             return (null, left);
 
-        if (left < current)
+        if (left < current.Range)
             return MergeToLeft(current.LeftNode, left);
 
-        if (current == left) // left in current
+        if (left.In(current.Range))
             return (current.LeftNode, current.Range.Left);
 
-        if (current < left)
+        if (left > current.Range)
         {
             (current.RightNode, var updatedLeft) = MergeToLeft(current.RightNode, left);
             return (current, updatedLeft);
@@ -79,22 +90,48 @@ record Node
         throw new NotImplementedException();
     }
 
-    private (Node? updated, long updatedRight) MergeToRight(/*this*/Node? current, long right)
+    private (Node? updated, long updatedRight) MergeToRight(Node? current, long right)
     {
         if (current is null)
             return (null, right);
 
-        if (current < right)
+        if (current.Range < right)
             return MergeToRight(current.RightNode, right);
 
-        if (current == right) // right in current
+        if (current.Range.Has(right))
             return (current.RightNode, current.Range.Right);
 
-        if (right < current)
+        if (current.Range > right)
         {
             (current.LeftNode, var updatedRight) = MergeToRight(current.LeftNode, right);
             return (current, updatedRight);
         }
+
+        throw new NotImplementedException();
+    }
+}
+
+static class BSTM
+{
+    internal static Node? Build(IEnumerable<Range> ranges)
+        => ranges.Aggregate<Range, Node?>(null,
+            (node, range) => node is null
+                ? new Node { Range = range }
+                : node.Merge(range));
+
+    internal static bool In(this Node? node, long value)
+    {
+        if (node is null)
+            return false;
+
+        if (value < node.Range)
+            return node.LeftNode.In(value);
+
+        if (value.In(node.Range))
+            return true;
+
+        if (value > node.Range)
+            return node.RightNode.In(value);
 
         throw new NotImplementedException();
     }
@@ -318,4 +355,52 @@ public class Test
         Assert.Null(result.LeftNode);
         Assert.Null(result.RightNode);
     }
+
+    [Fact]
+    public void Build()
+    {
+//             (12, 15)
+//            /        \
+//      (3, 5)          (23, 31)
+//             \
+//              (8, 10)
+
+        var ranges = new Range[] { (12, 15), (3, 5), (23, 31), (8, 10)};
+        Node result = BSTM.Build(ranges)!;
+
+        Assert.Equal((12, 15), result.Range);
+        Assert.Equal((3, 5), result.LeftNode!.Range);
+        Assert.Null(result.LeftNode!.LeftNode);
+        Assert.Equal((8, 10), result.LeftNode!.RightNode!.Range);
+        Assert.Null(result.LeftNode!.RightNode!.LeftNode);
+        Assert.Null(result.LeftNode!.RightNode!.RightNode);
+        Assert.Equal((23, 31), result.RightNode!.Range);
+        Assert.Null(result.RightNode!.LeftNode);
+        Assert.Null(result.RightNode!.RightNode);
+    }
+
+    [Theory]
+    [InlineData( 0, false)]
+    [InlineData( 2, false)]
+    [InlineData( 3,  true)]
+    [InlineData( 4,  true)]
+    [InlineData( 5,  true)]
+    [InlineData( 6, false)]
+    [InlineData( 7, false)]
+    [InlineData( 8,  true)]
+    [InlineData( 9,  true)]
+    [InlineData(10,  true)]
+    [InlineData(11, false)]
+    [InlineData(12,  true)]
+    [InlineData(15,  true)]
+    [InlineData(16, false)]
+    [InlineData(20, false)]
+    [InlineData(22, false)]
+    [InlineData(23,  true)]
+    [InlineData(27,  true)]
+    [InlineData(31,  true)]
+    [InlineData(32, false)]
+    [InlineData(35, false)]
+    public void In(long value, bool expected)
+        => Assert.Equal(expected, Input.In(value));
 }
