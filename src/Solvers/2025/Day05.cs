@@ -24,7 +24,12 @@ class IDs : Solver
 
         var bstm = BSTM.BSTM.Build(ranges)!;
 
-        return ids.Count(id => bstm.In(id));
+        #pragma warning disable CS8524
+        return Part switch
+        {
+            Part.A => ids.Count(bstm.In),
+            Part.B => bstm.Fold<long>(0, (acc, range) => acc + range.Right - range.Left + 1),
+        };
     }
 }
 
@@ -46,6 +51,7 @@ public class Test
 17
 32";
 
-        Assert.Equal(3, new IDs(Part.A).Solve(input));
+        Assert.Equal((long)  3, new IDs(Part.A).Solve(input));
+        Assert.Equal((long) 14, new IDs(Part.B).Solve(input));
     }
 }

@@ -135,6 +135,18 @@ static class BSTM
 
         throw new NotImplementedException();
     }
+
+    internal static TResult Fold<TResult>(
+        this Node? node, TResult seed, Func<TResult, Range, TResult> func)
+    {
+        if (node is null)
+            return seed;
+
+        var left = node.LeftNode.Fold(seed, func);
+        var curr = func(left, node.Range);
+        var right = node.RightNode.Fold(curr, func);
+        return right;
+    }
 }
 
 public class Test
