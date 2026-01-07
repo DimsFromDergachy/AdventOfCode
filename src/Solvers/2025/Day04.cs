@@ -1,5 +1,3 @@
-using System.Security.Cryptography;
-
 namespace Year2025.Day04;
 
 [Solver(2025, 4, Part.A)]
