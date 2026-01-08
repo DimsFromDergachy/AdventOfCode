@@ -7,9 +7,8 @@ class Defragmenter : Solver
     internal Defragmenter(Part part) : base(part) {}
 
     internal override object Solve(string input) =>
-        input.Chunk(2)
-             .Select(pair => (int.Parse(pair.First().ToString()),
-                              int.Parse(pair.Skip(1).First().ToString())))
+        input.ChunkWith((a, b) => (int.Parse(a.ToString()),
+                                   int.Parse(b.ToString())))
              .ToArray()
              .Defragment(Part)
              .SelectMany(pair => Enumerable.Repeat(pair.Item1, pair.Item2))

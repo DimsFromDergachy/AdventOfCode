@@ -11,8 +11,7 @@ class IdValidator : Solver
     internal override object Solve(string input)
         => input.Words(',', '-')
                 .Parse<long>()
-                .Chunk(2)
-                .Select(xs => new InvalidGenerator(Part, xs[0], xs[1]))
+                .ChunkWith((a, b) => new InvalidGenerator(Part, a, b))
                 .SelectMany(g => g.ToEnumerable())
                 .Sum();
 

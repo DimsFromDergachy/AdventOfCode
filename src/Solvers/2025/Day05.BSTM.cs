@@ -15,6 +15,7 @@ record Range
 {
     internal required long Left;
     internal required long Right;
+    internal long Size => Right - Left + 1;
 
     public static bool operator <(long value, Range range) => value < range.Left;
     public static bool operator >(long value, Range range) => value > range.Right;

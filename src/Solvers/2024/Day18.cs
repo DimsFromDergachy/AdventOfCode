@@ -19,8 +19,7 @@ class RamRunner : Solver
     {
         var inputs = input.Lines()
                           .SelectMany(line => line.Split(',').Parse<int>())
-                          .Chunk(2)
-                          .Select(args => (x: args[0], y: args[1]))
+                          .ChunkWith((a, b) => (x: a, y: b))
                           .ToArray();
 
         if (Part == Part.A)

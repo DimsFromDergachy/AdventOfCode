@@ -12,8 +12,7 @@ class PrintHelper : Solver
 
         var rules = lines.TakeWhile(line => !line.Equals(string.Empty))
                          .SelectMany(line => line.Split('|').Parse<int>())
-                         .Chunk(2)
-                         .Select(rule => (rule[0], rule[1]));
+                         .ChunkWith((a, b) => (a, b));
         var updates = lines.SkipWhile(line => !line.Equals(string.Empty))
                            .Skip(1)
                            .TakeWhile(line => !line.Equals(string.Empty))

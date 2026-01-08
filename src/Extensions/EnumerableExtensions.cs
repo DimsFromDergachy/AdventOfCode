@@ -114,6 +114,12 @@ static class EnumerableExtensions
         }
         while (true);
     }
+
+    // ChunkWith [1,2,3,4] (*) => [2, 12] //([1*2, 3*4])
+    internal static IEnumerable<TResult> ChunkWith<TSource, TResult>(
+        this IEnumerable<TSource> source, Func<TSource, TSource, TResult> func)
+            => source.Chunk(2)
+                     .Select(chunk => func(chunk[0], chunk[1]));
 }
 
 public class EnumerableExtensionsTest
@@ -212,5 +218,14 @@ public class EnumerableExtensionsTest
         int[] expected = [0, 1, 4, 13, 40, 121]; // a[i+1] = 3 * a[i] + 1
 
         Assert.Equal(expected, seed.Unfold(x => 3 * x + 1).Take(6));
+    }
+
+    [Fact]
+    public void ChunkWith()
+    {
+        int[] array = [1, 2, 3, 4];
+        int[] expected = [2, 12];
+
+        Assert.Equal(expected, array.ChunkWith((x, y) => x * y));
     }
 }

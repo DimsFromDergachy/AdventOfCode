@@ -15,8 +15,7 @@ class IDs : Solver
         var ranges = lines.TakeWhile(line => !line.Equals(string.Empty))
                           .SelectMany(line => line.Split('-'))
                           .Parse<long>()
-                          .Chunk(2)
-                          .Select(range => new BSTM.Range{ Left = range[0], Right = range[1]});
+                          .ChunkWith((a, b) => new BSTM.Range{ Left = a, Right = b});
 
         var ids = lines.SkipWhile(line => !line.Equals(string.Empty))
                        .Skip(1)
@@ -28,7 +27,7 @@ class IDs : Solver
         return Part switch
         {
             Part.A => ids.Count(bstm.In),
-            Part.B => bstm.Fold<long>(0, (acc, range) => acc + range.Right - range.Left + 1),
+            Part.B => bstm.Fold<long>(0, (acc, range) => acc + range.Size),
         };
     }
 }
