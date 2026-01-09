@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Year2024.Day20;
 
 [Solver(2024, 20, Part.A)]
@@ -55,6 +57,8 @@ class Cheater : Solver
         while (maze[curr.x, curr.y] != 'E');
     }
 
+    [Obsolete]
+    [ExcludeFromCodeCoverage]
     IEnumerable<(int start, int end, int cost)> Cheats(char[,] maze)
     {
         var M = maze.GetLength(1);

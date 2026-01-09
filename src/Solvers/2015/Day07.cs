@@ -210,7 +210,7 @@ z -> a";
     }
 
     [Fact(Timeout = 10000)]
-    public void StackOverflow()
+    public async Task StackOverflow()
     {
         var input = @"
 42 -> a
