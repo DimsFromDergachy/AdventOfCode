@@ -15,17 +15,16 @@ class Winner : Solver
     internal override object Solve(string input)
     {
         return input.Lines()
-                    .Chunk(3)
-                    .Select(Parse)
+                    .ChunkWith(Parse)
                     .Select(pzl => Solve(pzl).FirstOrDefault())
                     .Sum(pair => 3 * pair.A + pair.B);
     }
 
-    long[] Parse(string[] line)
+    long[] Parse(string lineA, string lineB, string lineP)
     {
-        var a = A.Match(line[0]).Groups;
-        var b = B.Match(line[1]).Groups;
-        var p = P.Match(line[2]).Groups;
+        var a = A.Match(lineA).Groups;
+        var b = B.Match(lineB).Groups;
+        var p = P.Match(lineP).Groups;
 
         return new string[] {
                 a[1].Value, a[2].Value,

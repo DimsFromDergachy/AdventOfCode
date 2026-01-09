@@ -115,11 +115,32 @@ static class EnumerableExtensions
         while (true);
     }
 
+    // ChunkTo [1,2,3,4,5,6] => [(1,2), (3,4), (5,6)]
+    internal static IEnumerable<(TSource, TSource)> ChunkTo<TSource, TTuple>(
+        this IEnumerable<TSource> source)
+            where TTuple : Tuple<TSource, TSource>
+                => source.ChunkWith((a, b) => (a, b));
+
+    // // ChunkTo [1,2,3,4,5,6] => [(1,2,3),(4,5,6)]
+    // // Type 'EnumerableExtensions' already defines a member called 'ChunkTo'
+    // // with the same parameter types (CS0111)
+    // internal static IEnumerable<(TSource, TSource, TSource)> ChunkTo<TSource, TTuple>(
+    //     this IEnumerable<TSource> source)
+    //         where TTuple : Tuple<TSource, TSource, TSource>
+    //             => source.ChunkWith((a, b, c) => (a, b, c));
+
     // ChunkWith [1,2,3,4] (*) => [2, 12] //([1*2, 3*4])
     internal static IEnumerable<TResult> ChunkWith<TSource, TResult>(
         this IEnumerable<TSource> source, Func<TSource, TSource, TResult> func)
             => source.Chunk(2)
                      .Select(chunk => func(chunk[0], chunk[1]));
+
+    // ChunkWith [1,2,3,4,5,6] (*) => [6, 120] //([1*2*3, 4*5*6])
+    internal static IEnumerable<TResult> ChunkWith<TSource, TResult>(
+        this IEnumerable<TSource> source, Func<TSource, TSource, TSource, TResult> func)
+            => source.Chunk(3)
+                     .Select(chunk => func(chunk[0], chunk[1], chunk[2]));
+
 }
 
 public class EnumerableExtensionsTest
@@ -223,9 +244,11 @@ public class EnumerableExtensionsTest
     [Fact]
     public void ChunkWith()
     {
-        int[] array = [1, 2, 3, 4];
-        int[] expected = [2, 12];
+        int[] array = [1, 2, 3, 4, 5, 6];
+        int[] expected2 = [2, 12, 30];
+        int[] expected3 = [6, 120];
 
-        Assert.Equal(expected, array.ChunkWith((x, y) => x * y));
+        Assert.Equal(expected2, array.ChunkWith((x, y) => x * y));
+        Assert.Equal(expected3, array.ChunkWith((x, y, z) => x * y * z));
     }
 }

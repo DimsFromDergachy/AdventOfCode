@@ -10,7 +10,7 @@ class Historian : Solver
     {
         var (list1, list2) = input.Lines()
              .SelectMany(line => line.Words().Parse<int>())
-             .ChunkWith((a, b) => (a, b))
+             .ChunkTo<int, Tuple<int, int>>()
              .Unzip();
 
         #pragma warning disable CS8524
