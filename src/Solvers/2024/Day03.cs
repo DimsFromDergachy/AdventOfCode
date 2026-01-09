@@ -3,18 +3,17 @@ using System.Text.RegularExpressions;
 namespace Year2024.Day03;
 
 [Solver(2024, 03, Part.A)]
-class Decorrupter : Solver
+class DeCorrupter : Solver
 {
     Regex regex = new Regex(@"mul\((\d{1,3}),(\d{1,3})\)");
 
     internal override object Solve(string input) =>
         regex.Matches(input)
              .Select(match => match.Groups)
-             .Select(group => int.Parse(group[1].Value) * int.Parse(group[2].Value))
-             .Sum();
+             .Sum(group => int.Parse(group[1].Value) * int.Parse(group[2].Value));
 }
 
-public class DecorrupterTest
+public class DeCorrupterTest
 {
     [Theory]
     [InlineData(0, "")]
@@ -24,12 +23,12 @@ public class DecorrupterTest
     [InlineData(161, "xmul(2,4)%&mul[3,7]!@^do_not_mul(5,5)+mul(32,64]then(mul(11,8)mul(8,5))")]
     public void Example(int expected, string input)
     {
-        Assert.Equal(expected, new Decorrupter().Solve(input));
+        Assert.Equal(expected, new DeCorrupter().Solve(input));
     }
 }
 
 [Solver(2024, 03, Part.B)]
-class DecorrupterDo : Solver
+class DeCorrupterDo : Solver
 {
     Regex regex = new Regex(@"(do\(\)|don't\(\)|mul\((\d{1,3}),(\d{1,3})\))");
 
@@ -55,12 +54,12 @@ class DecorrupterDo : Solver
     }
 }
 
-public class DecorrupterDoTest
+public class DeCorrupterDoTest
 {
     [Theory]
     [InlineData(48, "xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))")]
     public void Example(int expected, string input)
     {
-        Assert.Equal(expected, new DecorrupterDo().Solve(input));
+        Assert.Equal(expected, new DeCorrupterDo().Solve(input));
     }
 }

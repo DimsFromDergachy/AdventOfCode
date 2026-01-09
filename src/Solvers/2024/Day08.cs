@@ -148,5 +148,4 @@ T.........
 
         Assert.Equal(34, new Resonant(Part.B).Solve(input));
     }
-
 }

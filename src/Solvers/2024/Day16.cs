@@ -73,8 +73,7 @@ class Mazer : Solver
                     .Index;
 
         var min = Enumerable.Range(0, 4)
-                            .Select(z => dyno[z, E.x, E.y])
-                            .Min();
+                            .Min(z => dyno[z, E.x, E.y]);
 
         if (Part == Part.A)
             return min;

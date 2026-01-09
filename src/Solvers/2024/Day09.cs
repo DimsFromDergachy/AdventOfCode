@@ -13,8 +13,7 @@ class Defragmenter : Solver
              .Defragment(Part)
              .SelectMany(pair => Enumerable.Repeat(pair.Item1, pair.Item2))
              .Zip(Enumerable.Range(0, int.MaxValue))
-             .Select(pair => (long) (pair.First * pair.Second))
-             .Sum();
+             .Sum(pair => (long) (pair.First * pair.Second));
 }
 
 static class Extensions

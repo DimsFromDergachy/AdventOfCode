@@ -19,8 +19,7 @@ class Blinker : Solver
     internal override object Solve(string input) =>
         input.Words()
              .Parse<int>()
-             .Select(stone => Dyno(stone, Blink))
-             .Sum();
+             .Sum(stone => Dyno(stone, Blink));
 
 
     Dictionary<(long stone, long blink), long> memo = new Dictionary<(long, long), long>();
@@ -43,9 +42,7 @@ class Blinker : Solver
                                    long.Parse(s.Substring(s.Count() / 2))],
         };
 
-        return memo[(stone, blink)] = split.Select(stone => Dyno(stone, blink - 1))
-                                           .Sum();
-
+        return memo[(stone, blink)] = split.Sum(stone => Dyno(stone, blink - 1));
     }
 }
 

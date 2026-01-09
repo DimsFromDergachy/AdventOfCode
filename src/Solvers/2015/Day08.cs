@@ -5,8 +5,7 @@ class SolverA : Solver
 {
     internal override object Solve(string input) =>
         input.Lines()
-             .Select(line => line.Count() - line.Unescape().Count())
-             .Sum();
+             .Sum(line => line.Count() - line.Unescape().Count());
 }
 
 [Solver(2015, 08, Part.B)]
@@ -14,8 +13,7 @@ class SolverB : Solver
 {
     internal override object Solve(string input) =>
         input.Lines()
-             .Select(line => line.Escape().Count() - line.Count())
-             .Sum();
+             .Sum(line => line.Escape().Count() - line.Count());
 }
 
 static class StringExtensions

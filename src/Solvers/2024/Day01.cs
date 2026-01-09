@@ -31,8 +31,7 @@ class Historian : Solver
         var group = list2.GroupBy(x => x)
                          .ToDictionary(group => group.Key);
 
-        return list1.Select(x => group.ContainsKey(x) ? x * group[x].Count() : 0)
-                    .Sum();
+        return list1.Sum(x => group.ContainsKey(x) ? x * group[x].Count() : 0);
     }
 }
 

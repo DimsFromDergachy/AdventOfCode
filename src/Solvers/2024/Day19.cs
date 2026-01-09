@@ -26,7 +26,7 @@ class Onsen : Solver
 
     long IsPattern(string[] towels, string line)
     {
-        int maxk = towels.Select(towel => towel.Count()).Max();
+        int maxk = towels.Max(towel => towel.Count());
         var dyno = new long[line.Count() + 1, maxk + 1];
         dyno[0, 0] = 1;
 

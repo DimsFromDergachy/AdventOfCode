@@ -122,7 +122,7 @@ class Gardener : Solver
                                     else
                                         return (point.x, res.Item2);
                                     }))
-                            .Sum(gr => gr.Item2);
+                                .Sum(gr => gr.Item2);
 
                 var vs1 = fences.GroupBy(fence => fence.dir)
                                 .First(gr => gr.Key == (0, +1))

@@ -25,7 +25,7 @@ class RamRunner : Solver
         if (Part == Part.A)
         {
             var map = inputs.Take(Count)
-                        .Aggregate(new bool[Size.X + 1, Size.Y + 1],
+                            .Aggregate(new bool[Size.X + 1, Size.Y + 1],
                                    (map, pair) =>
                                    {
                                         map[pair.x, pair.y] = true;

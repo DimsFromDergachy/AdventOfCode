@@ -22,13 +22,11 @@ class PrintHelper : Solver
         return Part switch
         {
             Part.A => updates.Where(update => CheckUpdate(rules, update))
-                             .Select(update => update.Skip(update.Count() / 2).First())
-                             .Sum(),
+                             .Sum(update => update.Skip(update.Count() / 2).First()),
             Part.B => updates.Where(update => !CheckUpdate(rules, update))
                              .Select(update => update.ToArray())
                              .Select(update => FixUpdate(rules, update))
-                             .Select(update => update.Skip(update.Count() / 2).First())
-                             .Sum(),
+                             .Sum(update => update.Skip(update.Count() / 2).First()),
         };
     }
 

@@ -325,7 +325,7 @@ tnw OR pbm -> gnj
     // [InlineData(23)]
     // [InlineData(38)]
     // [InlineData(39)]
-    internal void Vanted(int bit)
+    internal void Wanted(int bit)
     {
         var input = File.ReadAllText("./Solvers/2024/Data/Day24");
 

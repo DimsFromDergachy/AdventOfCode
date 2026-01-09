@@ -21,8 +21,7 @@ class SalesSanta : Solver
                              .Distinct()
                              .Permutations()
                              .Select(path => path.Zip(path.Skip(1))
-                                                 .Select(pair => graph[pair])
-                                                 .Sum());
+                                                 .Sum(pair => graph[pair]));
 
         #pragma warning disable CS8524
         return Part switch

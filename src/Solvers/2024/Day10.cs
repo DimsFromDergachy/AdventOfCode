@@ -21,17 +21,15 @@ class Hiker : Solver
                          .Where(pair => pair.Value == '0')
                          .Select(pair => pair.Index)
                          .Select(index => GetTrailTails(map, index))
-                         .Select(tails => tails.DistinctBy(tail => tail.pos)
-                                               .Count())
-                         .Sum(),
+                         .Sum(tails => tails.DistinctBy(tail => tail.pos)
+                                            .Count()),
             Part.B => map.ToEnumerable()
                          .Where(pair => pair.Value == '0')
                          .Select(pair => pair.Index)
                          .Select(index => GetTrailTails(map, index))
                          .SelectMany(tails => tails.GroupBy(tail => tail.pos)
                                                    .Select(gr => gr.MaxBy(trail => trail.score)))
-                                                   .Select(tail => tail.score)
-                         .Sum(),
+                         .Sum(tail => tail.score),
         };
     }
 

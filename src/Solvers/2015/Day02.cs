@@ -6,8 +6,7 @@ class SolverA : Solver
     internal override object Solve(string input) =>
         input.Lines()
              .Select(line => line.Split('x').Parse<int>().ToArray())
-             .Select(Wrapping)
-             .Sum();
+             .Sum(Wrapping);
 
     int Wrapping(params int[] args)
     {
@@ -23,8 +22,7 @@ class SolverB : Solver
     internal override object Solve(string input) =>
         input.Lines()
              .Select(line => line.Words('x').Parse<int>().ToArray())
-             .Select(Ribboning)
-             .Sum();
+             .Sum(Ribboning);
 
     int Ribboning(params int[] args)
     {

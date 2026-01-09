@@ -214,7 +214,7 @@ public class CheaterTest
     {
         var input = File.ReadAllText("./Solvers/2024/Data/Day20");
 
-        Assert.Equal(1530, new Cheater(Part.A).Solve(input)); 
+        Assert.Equal(   1530, new Cheater(Part.A).Solve(input)); 
         Assert.Equal(1033983, new Cheater(Part.B).Solve(input));
     }
 }

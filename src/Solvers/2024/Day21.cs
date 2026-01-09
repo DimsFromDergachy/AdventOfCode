@@ -34,7 +34,7 @@ internal class RemoteController : Solver
     {
         var input = long.Parse(line.SkipLast(1).ToArray());
         var moves = robots.Aggregate(line.Skip(0),
-                                (l, r) => r.Moves(l));
+                                    (l, r) => r.Moves(l));
         return input * moves.LongCount();
     }
 
@@ -191,8 +191,8 @@ internal class RemoteController : Solver
                     var moves = robot.Moves([b]).Prepend('A').ToArray();
                     var pairs = moves.Zip(moves.Skip(1));
 
-                    dyno.Add((a, b, level), pairs.Select(pair =>
-                        dyno[(pair.First, pair.Second, level - 1)]).Sum());
+                    dyno.Add((a, b, level), pairs.Sum(pair =>
+                        dyno[(pair.First, pair.Second, level - 1)]));
 
                 }
             }
@@ -250,7 +250,7 @@ public class RemoteControllerTest
     }
 
     [Fact]
-    internal void SubOptimalsNumPad()
+    internal void SubOptimalNumPad()
     {
         RemoteController.Remote[] robots = [
             new RemoteController.RemoteNumPad(),
@@ -337,7 +337,7 @@ public class RemoteControllerTest
     }
 
     [Fact]
-    internal void SubOptimalsDirPad()
+    internal void SubOptimalDirPad()
     {
         RemoteController.Remote[] robots = [
             new RemoteController.RemoteDirPad(),
