@@ -67,7 +67,6 @@ class RotaryLock : Solver
     }
 }
 
-
 public class Test
 {
     [Fact]

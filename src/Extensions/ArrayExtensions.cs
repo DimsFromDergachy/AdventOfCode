@@ -69,6 +69,38 @@ static class ArrayExtensions
 
         return result;
     }
+
+    internal static IEnumerable<TElem> FoldRows<TElem>(this TElem[,] array, Monoid<TElem> monoid)
+        => array.FoldRows(Enumerable.Repeat(monoid, array.GetLength(1)).ToArray());
+
+    internal static IEnumerable<TElem> FoldRows<TElem>(this TElem[,] array, Monoid<TElem>[] monoids)
+    {
+        Assert.Equal(array.GetLength(1), monoids.Length);
+
+        for (int j = 0; j < array.GetLength(1); j++)
+        {
+            var result = monoids[j].Empty;
+            for (int i = 0; i < array.GetLength(0); i++)
+                result = monoids[j].Append(result, array[i, j]);
+            yield return result;
+        }
+    }
+
+    internal static IEnumerable<TElem> FoldColumns<TElem>(this TElem[,] array, Monoid<TElem> monoid)
+        => array.FoldColumns(Enumerable.Repeat(monoid, array.GetLength(0)).ToArray());
+
+    internal static IEnumerable<TElem> FoldColumns<TElem>(this TElem[,] array, Monoid<TElem>[] monoids)
+    {
+        Assert.Equal(array.GetLength(0), monoids.Length);
+
+        for (int i = 0; i < array.GetLength(0); i++)
+        {
+            var result = monoids[i].Empty;
+            for (int j = 0; j < array.GetLength(1); j++)
+                result = monoids[i].Append(result, array[i, j]);
+            yield return result;
+        }
+    }
 }
 
 internal class _2D {}
@@ -130,5 +162,23 @@ XOXXO
 
         Assert.Equal(expected.Lines().ToArray(),
                         input.Lines().ToArray().AddBorders('.'));
+    }
+
+    [Fact]
+    public void Folds()
+    {
+        var input = @"
+            1 2 3
+            4 5 6";
+
+        var array = input.Lines()
+                         .Select(line => line.Words().Parse<int>())
+                         .ToArray();
+
+        Assert.Equal([6, 15], array.FoldRows(new Sum<int>()));
+        Assert.Equal([6, 120], array.FoldRows(new Product<int>()));
+
+        Assert.Equal([5, 7, 9], array.FoldColumns(new Sum<int>()));
+        Assert.Equal([4, 10, 18], array.FoldColumns(new Product<int>()));
     }
 }

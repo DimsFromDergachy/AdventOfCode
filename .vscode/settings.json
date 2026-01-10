@@ -1,6 +1,8 @@
 {
     "dotnet-test-explorer.testProjectPath": "**/*test.@(csproj|vbproj|fsproj)",
     "cSpell.words": [
-        "BSTM"
+        "BSTM",
+        "Monoid",
+        "monoids"
     ]
 }
